@@ -115,6 +115,14 @@ def main():
     # load the low resolution surfaces, the vertices of the high resolution surfaces, and initialise cell locator algorithms
     surfaces, points, locators = initialise_surfaces([args.lh_surface_hi, args.lh_surface_lo, args.rh_surface_hi, args.rh_surface_lo])
 
+    lh_surf_n = surfaces[0].GetNumberOfPoints()
+    rh_surf_n = surfaces[1].GetNumberOfPoints()
+    surf_n = lh_surf_n + rh_surf_n
+
+    lh_orig_n = points[0].GetNumberOfPoints()
+    rh_orig_n = points[1].GetNumberOfPoints()
+    orig_n = lh_orig_n + rh_orig_n
+
     # initialise pointers for cell locator
     intersection = [0, 0, 0]
     cell_id = vtk.reference(0)
@@ -123,6 +131,9 @@ def main():
 
     offset = 0
     snapped = defaultdict(list)
+
+    leftvertex = np.empty(lh_surf_n, np.int64)
+    rightvertex = np.empty(rh_surf_n, np.int64)
 
     logging.info('Snapping mesh to nearest downsampled vertices.')
 
@@ -139,23 +150,19 @@ def main():
             index = snap_to_closest_vertex(surfaces[surface_id].GetCell(cell_id.get()), intersection)
             snapped[index + offset].append(i + offset)
 
-            if np.array_equal(points[surface_id].GetPoint(i), intersection):
+            if np.array_equal(points[surface_id].GetPoint(i), surfaces[surface_id].GetPoints().GetPoint(index)):
+                if offset == 0:
+                    leftvertex[index] = i
+                else:
+                    rightvertex[index] = i
+
                 count = count + 1
 
         offset = offset + n
-        logging.info('Same vertices =' + str(count))
 
     # get the shape of the original mesh, and the new mesh
     vertices = snapped.values()
     n = len(vertices)
-
-    lh_surf_n = surfaces[0].GetNumberOfPoints()
-    rh_surf_n = surfaces[1].GetNumberOfPoints()
-    surf_n = lh_surf_n + rh_surf_n
-
-    lh_orig_n = points[0].GetNumberOfPoints()
-    rh_orig_n = points[1].GetNumberOfPoints()
-    orig_n = lh_orig_n + rh_orig_n
 
     # make sure nothing went wrong
     if not n == surf_n:
@@ -166,7 +173,7 @@ def main():
 
     # save the results: mapping contains arrays of vertex numbers from original mesh that have been assigned to each
     # of the vertices of the downsampled mesh; shape has the number of vertices for both high and low resolution meshes.
-    np.savez_compressed(args.output, mapping=vertices, shape=shape)
+    np.savez_compressed(args.output, mapping=vertices, shape=shape, lh_ids=leftvertex, rh_ids=rightvertex)
 
 
 if __name__ == "__main__":
