@@ -180,7 +180,7 @@ def main():
     print "Mean triangle area for meshB: " + str(np.mean(hi_area))
     print "SD triangle area for meshB: " + str(np.std(hi_area))
 
-    np.savez_compressed(args.output, mesha=lo_to_hi, meshb=hi_to_low)
+    np.savez_compressed(args.output, mesha=lo_to_hi, meshb=hi_to_lo)
 
 
 if __name__ == "__main__":
