@@ -14,11 +14,8 @@ def _build_args_parser():
     p = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                 description=DESCRIPTION)
 
-    p.add_argument('--lh_time_series', action='store', metavar='LH_TIME_SERIES', required=True,
-                   type=str, help='Path of the file containing functional time series for the left hemisphere.')
-
-    p.add_argument('--rh_time_series', action='store', metavar='RH_TIME_SERIES', required=True,
-                   type=str, help='Path of the file containing functional time series for the right hemisphere.')
+    p.add_argument('--time_series', action='store', metavar='LH_TIME_SERIES', required=True,
+                   type=str, help='Path of the .npz file containing functional time series.')
 
     p.add_argument('--mesh', action='store', metavar='MESH', required=True,
                    type=str, help='Path to the mapping for the resolution of the surfacecs (.npz).')
@@ -49,11 +46,8 @@ def main():
     logging.basicConfig(level=logging.INFO)
 
     # make sure the input files exist
-    if not isfile(args.lh_time_series):
-        parser.error('The file "{0}" must exist.'.format(args.lh_time_series))
-
-    if not isfile(args.rh_time_series):
-        parser.error('The file "{0}" must exist.'.format(args.rh_time_series))
+    if not isfile(args.time_series):
+        parser.error('The file "{0}" must exist.'.format(args.time_series))
 
     if not isfile(args.mesh):
         parser.error('The file "{0}" must exist.'.format(args.mesh))
@@ -71,19 +65,13 @@ def main():
     mapping = mesh['mapping']
     shape = mesh['shape']
 
+    logging.info('Loading timeseries data.')
+
     # load time series for left and right hemispheres
-    time_series_lh = nib.load(args.lh_time_series)
-    time_series_data_lh = time_series_lh.get_data()
-
-    time_series_rh = nib.load(args.rh_time_series)
-    time_series_data_rh = time_series_rh.get_data()
-
-    # join time series from both sides as one large dataset
-    time_series_data = np.concatenate((time_series_data_lh[:, 0, 0, :], time_series_data_rh[:, 0, 0, :]))
+    time_series_data = np.load(args.time_series)
+    time_series_data = np.concatenate((time_series_data['lh_time_series'], time_series_data['rh_time_series']))
 
     logging.info('TS length:' + str(time_series_data.shape))
-    logging.info('LH length:' + str(time_series_data_lh.shape))
-    logging.info('RH length:' + str(time_series_data_rh.shape))
     logging.info('Calculating mean signal for ' + str(shape[0]) + ' vertices.')
 
     # initialise an array to fill in the loop

@@ -91,32 +91,44 @@ python ${SCRIPT_PATH}/calculate_density.py \
 
 cd $FCDIR
 
-# Step1) Calculate FC matrix (Pearsons)
-python ${SCRIPT_PATH}/calculate_fc.py \
+# Step1) Calculate FC (no confounders)
+python ${SCRIPT_PATH}/calculate_residual_timeseries.py \
        --lh_time_series ./fmcpr.sdf.sm5.self.lh.nii.gz \
        --rh_time_series ./fmcpr.sdf.sm5.self.rh.nii.gz \
+       --output ${OUTPUTDIR}/fc_ts_${SIZE}.npz -f
+
+python ${SCRIPT_PATH}/calculate_fc.py \
+       --time_series ${OUTPUTDIR}/fc_ts_${SIZE}.npz \
        --mesh ${OUTPUTDIR}/mapping_${SIZE}.npz \
        --output ${OUTPUTDIR}/fc_${SIZE}.npz -f
 
-# Step2) Calculate FC matrix (Partial correlation controlling for confounders)
-python ${SCRIPT_PATH}/calculate_partial_fc.py \
+# Step2) Calculate FC (wm, motion, vcsf confounders)
+python ${SCRIPT_PATH}/calculate_residual_timeseries.py \
        --lh_time_series ./fmcpr.sdf.sm5.self.lh.nii.gz \
        --rh_time_series ./fmcpr.sdf.sm5.self.rh.nii.gz \
-       --mesh ${OUTPUTDIR}/mapping_${SIZE}.npz \
        --motion ./fmcpr.mcdat \
        --wm ./wm.dat \
        --vcsf ./vcsf.dat \
+       --output ${OUTPUTDIR}/fc_ts_partial_${SIZE}.npz -f
+
+python ${SCRIPT_PATH}/calculate_fc.py \
+       --time_series ${OUTPUTDIR}/fc_ts_partial_${SIZE}.npz \
+       --mesh ${OUTPUTDIR}/mapping_${SIZE}.npz \
        --output ${OUTPUTDIR}/fc_partial_${SIZE}.npz -f
 
-# Step3) Calculate FC matrix (Partial correlation controlling for confounders and gsl)
-python ${SCRIPT_PATH}/calculate_partial_fc_with_global.py \
+# Step3) Calculate FC (wm, motion, vcsf, gsl confounders)
+python ${SCRIPT_PATH}/calculate_residual_timeseries.py \
        --lh_time_series ./fmcpr.sdf.sm5.self.lh.nii.gz \
        --rh_time_series ./fmcpr.sdf.sm5.self.rh.nii.gz \
-       --mesh ${OUTPUTDIR}/mapping_${SIZE}.npz \
        --motion ./fmcpr.mcdat \
        --wm ./wm.dat \
        --vcsf ./vcsf.dat \
        --gsl ./global.waveform.dat \
+       --output ${OUTPUTDIR}/fc_ts_partial_gsl_${SIZE}.npz -f
+
+python ${SCRIPT_PATH}/calculate_fc.py \
+       --time_series ${OUTPUTDIR}/fc_ts_partial_gsl_${SIZE}.npz \
+       --mesh ${OUTPUTDIR}/mapping_${SIZE}.npz \
        --output ${OUTPUTDIR}/fc_partial_gsl_${SIZE}.npz -f
 
 # Step4) Calculate masks for vertices within an epsilon mm radius of each other vertex
