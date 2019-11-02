@@ -159,3 +159,19 @@ python ${SCRIPT_PATH}/calculate_dst_mask.py \
        --mesh ${OUTPUTDIR}/mapping_${SIZE}.npz \
        --epsilon 20 \
        --output ${OUTPUTDIR}/mask_${SIZE}_20mm.npz -f
+
+# Step5) Calculate correlation maps for visualisation
+python ${SCRIPT_PATH}/calculate_seed_mapping.py \
+       --seed_id 23 \
+       --hemisphere 0 \
+       --time_series ${OUTPUTDIR}/fc_ts_partial_${SIZE}.npz \
+       --sc_matrix ${OUTPUTDIR}/sc_${SIZE}.npz \
+       --roi ${OUTPUTDIR}/desikan_roi_${SIZE}.npz \
+       --mesh ${OUTPUTDIR}/mapping_${SIZE}.npz \
+       --output ${OUTPUTDIR}/corr_maps_partial_${SIZE}.npz -f
+
+python ${SCRIPT_PATH}/calculate_sc_fc_cor_map.py \
+       --fc_matrix ${OUTPUTDIR}/fc_partial_${SIZE}.npz \
+       --sc_matrix ${OUTPUTDIR}/sc_${SIZE}.npz \
+       --mesh ${OUTPUTDIR}/mapping_${SIZE}.npz \
+       --output ${OUTPUTDIR}/fc_sc_corr_map_${SIZE}.npz -f
