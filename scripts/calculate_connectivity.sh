@@ -175,3 +175,16 @@ python ${SCRIPT_PATH}/calculate_sc_fc_cor_map.py \
        --sc_matrix ${OUTPUTDIR}/sc_${SIZE}.npz \
        --mesh ${OUTPUTDIR}/mapping_${SIZE}.npz \
        --output ${OUTPUTDIR}/fc_sc_corr_map_${SIZE}.npz -f
+
+python ${SCRIPT_PATH}/embed_data.py \
+       --lh_surface ${OUTPUTDIR}/lh_white_${SIZE}.vtk \
+       --rh_surface ${OUTPUTDIR}/rh_white_${SIZE}.vtk \
+       --data ${OUTPUTDIR}/corr_maps_partial_${SIZE}.npz \
+       --mesh ${OUTPUTDIR}/mapping_${SIZE}.npz -f
+
+python ${SCRIPT_PATH}/embed_data.py \
+       --lh_surface ${OUTPUTDIR}/lh_white_${SIZE}.vtk \
+       --rh_surface ${OUTPUTDIR}/rh_white_${SIZE}.vtk \
+       --data ${OUTPUTDIR}/fc_sc_corr_map_${SIZE}.npz \
+       --mesh ${OUTPUTDIR}/mapping_${SIZE}.npz \
+       --suffix _fc_sc_ -f
