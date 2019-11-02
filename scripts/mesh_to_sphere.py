@@ -50,7 +50,7 @@ def main():
         parser.error('The file "{0}" must exist.'.format(args.lh_surface))
 
     if not isfile(args.lh_surface):
-        parser.error('The file "{0}" must exist.'.format(args.lh_surface))
+        parser.error('The file "{0}" must exist.'.format(args.rh_surface))
 
     if not isfile(args.mesh):
         parser.error('The file "{0}" must exist.'.format(args.mesh))
