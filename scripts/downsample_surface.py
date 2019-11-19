@@ -50,7 +50,6 @@ def downsample_surface(surface_file, reduction, output):
     decimate.SetInputData(surface)
     decimate.SetTargetReduction(reduction)
     decimate.PreserveTopologyOff()
-    decimate.Update()
 
     # remove unneeded vertices
     clean.SetInputConnection(decimate.GetOutputPort())
