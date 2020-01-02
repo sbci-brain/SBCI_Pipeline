@@ -46,10 +46,16 @@ def downsample_surface(surface_file, reduction, output):
     # load the surface
     surface = load_vtk(surface_file)
 
+    # To guarantee a given level of reduction, 
+    # the ivar PreserveTopology must be off; the ivar Splitting is on; 
+    # the ivar BoundaryVertexDeletion is on; and the ivar MaximumError is set to VTK_DOUBLE_MAX
     # reduce the number of vertices in the mesh
     decimate.SetInputData(surface)
     decimate.SetTargetReduction(reduction)
     decimate.PreserveTopologyOff()
+    decimate.SplittingOn()
+    decimate.BoundaryVertexDeletionOn()
+    decimate.SetMaximumError(vtk.VTK_DOUBLE_MAX)
 
     # remove unneeded vertices
     clean.SetInputConnection(decimate.GetOutputPort())
