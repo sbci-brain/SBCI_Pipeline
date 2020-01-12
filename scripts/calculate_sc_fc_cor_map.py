@@ -117,10 +117,14 @@ def main():
 
         # if all values in the row are nans, set the result to nan and move on
         if not np.any(mask_idx):
-            result[i] = np.nan
+            #result[i] = np.nan
+            result[i] = -2
             continue
 
         result[i] = np.corrcoef(fc_row[mask_idx], sc_row[mask_idx])[0,1]
+
+        if np.isnan(result[i]):
+            result[i] = -2
 
     # save the results
     np.savez_compressed(args.output, corr_map=result)
