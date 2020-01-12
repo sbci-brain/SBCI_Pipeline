@@ -3,7 +3,7 @@ import logging
 import numpy as np
 import vtk
 
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from os.path import isfile
 
 DESCRIPTION = """
@@ -56,11 +56,11 @@ def initialise_surfaces(surface_files):
     surfaces[1] = load_vtk(surface_files[3])
 
     # initialise locator algorithms for the downsampled mesh
-    locators[0] = vtk.vtkCellLocator()
+    locators[0] = vtk.vtkPointLocator()
     locators[0].SetDataSet(surfaces[0])
     locators[0].BuildLocator()
 
-    locators[1] = vtk.vtkCellLocator()
+    locators[1] = vtk.vtkPointLocator()
     locators[1].SetDataSet(surfaces[1])
     locators[1].BuildLocator()
 
@@ -69,20 +69,6 @@ def initialise_surfaces(surface_files):
     points[1] = load_vtk(surface_files[2]).GetPoints()
 
     return surfaces, points, locators
-
-
-# snap the given vertex to the nearest vertex of the given triangle
-def snap_to_closest_vertex(cell, intersection):
-    poly_pts = cell.GetPoints()
-    triangle = np.array([poly_pts.GetPoint(j) for j in range(poly_pts.GetNumberOfPoints())])
-
-    # vectorise squared euler distance between the intersection and the triangle, return index of closest vertex
-    dist = np.sum((triangle - intersection)**2, axis=1)
-    tri_id = np.argmin(dist)
-    vertex_id = cell.GetPointIds().GetId(tri_id)
-
-    # populate the result arrays
-    return vertex_id
 
 
 def main():
@@ -123,17 +109,12 @@ def main():
     rh_orig_n = points[1].GetNumberOfPoints()
     orig_n = lh_orig_n + rh_orig_n
 
-    # initialise pointers for cell locator
-    intersection = [0, 0, 0]
-    cell_id = vtk.reference(0)
-    sub_id = vtk.reference(0)
-    d = vtk.reference(0)
-
+    # initialise variables for loop
     offset = 0
     snapped = defaultdict(list)
 
-    leftvertex = np.empty(lh_surf_n, np.int64)
-    rightvertex = np.empty(rh_surf_n, np.int64)
+    leftvertex = np.ones(lh_surf_n, np.int64) * -1
+    rightvertex = np.ones(rh_surf_n, np.int64) * -1
 
     logging.info('Snapping mesh to nearest downsampled vertices.')
 
@@ -144,12 +125,12 @@ def main():
         count = 0
         for i in range(n):
             # find the closest point and triangle of the lower resolution mesh to a given vertex on the full mesh
-            locators[surface_id].FindClosestPoint(points[surface_id].GetPoint(i), intersection, cell_id, sub_id, d)
+            index = locators[surface_id].FindClosestPoint(points[surface_id].GetPoint(i))
 
             # snap the in point to the closest vertex on the mesh (vertex 0 on rh side is equal to the number of vertices on lh side).
-            index = snap_to_closest_vertex(surfaces[surface_id].GetCell(cell_id.get()), intersection)
             snapped[index + offset].append(i + offset)
 
+            # save the original id of the vertices that were not deleted from the high resolution mesh
             if np.array_equal(points[surface_id].GetPoint(i), surfaces[surface_id].GetPoints().GetPoint(index)):
                 if offset == 0:
                     leftvertex[index] = i
@@ -160,13 +141,18 @@ def main():
 
         offset = offset + n
 
-    # get the shape of the original mesh, and the new mesh
+    # order the mapping to low resolution vertex order (same ordering as leftvertex and rightvertex)
+    snapped = OrderedDict(sorted(snapped.items(), key=lambda t: t[0]))
+
     vertices = snapped.values()
     n = len(vertices)
 
     # make sure nothing went wrong
     if not n == surf_n:
         logging.info('Warning: Mesh and mapping have different number of points.')
+
+    if np.sum(leftvertex < 0) + np.sum(rightvertex < 0) > 0:
+        logging.info('Warning: Not all points correspond to higher resolution mesh.')
 
     # save the shape of the original and new mesh
     shape = np.array([surf_n, lh_surf_n, rh_surf_n, orig_n, lh_orig_n, rh_orig_n])
