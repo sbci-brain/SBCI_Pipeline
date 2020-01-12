@@ -3,10 +3,11 @@ import logging
 import numpy as np
 import scipy.sparse as sparse
 
+from scipy import stats
 from os.path import isfile
 
 DESCRIPTION = """
-  Calculate the correlation between functional and structural connectivity (using Pearson Correlation) for the given mapping.
+  Calculate the seed based correlation for functional and structural connectivity (using Pearson Correlation) using the given mapping.
 """
 
 
@@ -39,17 +40,6 @@ def _build_args_parser():
                    help='If set, overwrite files if they already exist.')
 
     return p
-
-
-# calculate the 2D (vector) Pearson correlation
-def corr2(X, Y):
-    X_mX = X - X.mean(axis=1).reshape((-1, 1))
-    Y_mY = Y - Y.mean(axis=1).reshape((-1, 1))
-
-    ssX = (X_mX**2).sum(axis=1).reshape((-1, 1))
-    ssY = (Y_mY**2).sum(axis=1).reshape((1, -1))
-
-    return np.dot(X_mX, Y_mY.T) / np.sqrt(np.dot(ssX, ssY))
 
 
 def main():
@@ -133,7 +123,7 @@ def main():
 
     for i in range(shape[0]):
         if not fc_mapping[i] == 1:
-            fc_mapping[i] = np.corrcoef(seed_time_series[0, :], mean_time_series[i, :])[0,1]
+            fc_mapping[i] = -np.log10(stats.pearsonr(seed_time_series[0, :], mean_time_series[i, :])[1])
             
         if np.isnan(fc_mapping[i]):
             fc_mapping[i] = -2
@@ -143,6 +133,7 @@ def main():
     # load the SC matrix (sc is caluclated by summing rows)
     sc_matrix = np.array(sparse.load_npz(args.sc_matrix).todense())
     sc_mapping = np.sum(sc_matrix[mask, :], axis=0)
+    sc_mapping = np.log(sc_mapping, where=(sc_mapping != 0))
 
     if np.any(sc_mapping[mask]):
         sc_mapping[mask] = 1
