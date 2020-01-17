@@ -1,3 +1,5 @@
+% MATLAB R2009b
+% Perform region-based analysis
 clear variables;
 
 folder = './test_data/connectivity/RN015_ENTRY';
