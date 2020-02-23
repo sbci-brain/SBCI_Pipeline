@@ -2,7 +2,8 @@
 % Perform region-based analysis
 clear variables;
 
-folder = './test_data/connectivity/RN015_ENTRY';
+folder = '/scratch/dmi/zzhang87_lab/mcole22/SBCI/HCP_test/SBCI/103818';
+out = '/scratch/dmi/zzhang87_lab/mcole22/SBCI/HCP_test/SBCI/103818/results';
 ress = [{'99'}, {'97'}, {'95'}];
 
 %cons = [{'pg'}, {'p'}, {''}];
@@ -10,7 +11,6 @@ ress = [{'99'}, {'97'}, {'95'}];
 
 cons = [{'pg'}, {'p'}];
 descs = [{'FC|SC controlling for gs'}, {'FC|SC'}];
-
 
 % brain regions (r: right, l: left, f: frontal, t: temporal, etc.)
 rfl = fliplr([65,61,60,57,53,52,51,50,47,45,37]);
@@ -80,7 +80,7 @@ for j = 1:length(ress)
     [sc,fc] = np2matlab(sprintf('%s/connectivity%s%s.mat', folder, res, con));
     [sc,fc,nan_mask,sorted_idx,roi_labels] = sortandmask(sprintf('%s/mapping%s%s.mat', folder, res, con), sc, fc);
 
-    stats = plotwmhist(sc, fc, sprintf('0.%s %s', res, desc), sprintf('%s%s.png', res, con));
+    stats = plotwmhist(sc, fc, sprintf('0.%s %s', res, desc), sprintf('%s/%s%s.png', out, res, con));
     
     result(k, 1:end) = stats;
     k = k + 1;
@@ -100,18 +100,18 @@ for j = 1:length(ress)
 
       stats = plotwmhist(region_sc, region_fc, ...
           sprintf('0.%s %s - %s & %s', res, desc, regions{u, 3}, regions{u, 4}), ...
-          sprintf('%s%s_%s_0.png', res, con, regions{u, 5}));
+          sprintf('%s/%s%s_%s_0.png', out, res, con, regions{u, 5}));
     
       result(k, 1:end) = stats;
       k = k + 1;
     
       plotmatrix(log(region_sc), roi_labels(region_mask), ...
           sprintf('0.%s %s - %s & %s SC', res, desc, regions{u, 3}, regions{u, 4}), ...
-          sprintf('%s%s_%s_sc.png', res, con, regions{u, 5}), []);
+          sprintf('%s/%s%s_%s_sc.png', out, res, con, regions{u, 5}), []);
     
       plotmatrix(region_fc, roi_labels(region_mask), ...
           sprintf('0.%s %s - %s & %s FC', res, desc, regions{u, 3}, regions{u, 4}), ...
-          sprintf('%s%s_%s_fc.png', res, con, regions{u, 5}), [-0.9, 0.9]);
+          sprintf('%s/%s%s_%s_fc.png', out, res, con, regions{u, 5}), [-0.9, 0.9]);
 
       r1 = size(mask_a, 2);
       r2 = size(region_mask, 2);
@@ -132,7 +132,7 @@ for j = 1:length(ress)
         padded_fc = padarray(inter_fc, max(size(inter_fc)) - size(inter_fc), nan, 'post');
 
         stats = plotwmhist(padded_sc, padded_fc, labels{v}, ...
-            sprintf('%s%s_%s_%s.png', res, con, regions{u, 5}, string(v)));
+            sprintf('%s/%s%s_%s_%s.png', out, res, con, regions{u, 5}, string(v)));
     
         result(k, 1:end) = stats;
         k = k + 1;
@@ -155,8 +155,8 @@ for j = 1:length(ress)
       fc(dst_mask) = nan;
 
       stats = plotwmhist(sc, fc, ...
-          sprintf('0.%s %s - %s mask', res, desc, masks{u,2}), ...
-          sprintf('%s%s_%s.png', res, con, masks{u,2}));
+          sprintf('%s/0.%s %s - %s mask', out, res, desc, masks{u,2}), ...
+          sprintf('%s/%s%s_%s.png', out, res, con, masks{u,2}));
     
       result(k, 1:end) = stats;
       k = k + 1;
@@ -164,4 +164,4 @@ for j = 1:length(ress)
   end
 end
 
-writetable(result, 'result.txt');
+writetable(result, sprintf('%s/result.txt', out));
