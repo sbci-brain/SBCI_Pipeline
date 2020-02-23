@@ -72,10 +72,20 @@ def main():
         else:
             parser.error('The file "{0}" already exists. Use -f to overwrite it.'.format(args.output))
 
-    # load confounder data
-    # TODO: remove magic numbers
-    confounders = np.ones([1, 300])
+    # load time series for left and right hemispheres
+    time_series_lh = nib.load(args.lh_time_series)
+    time_series_data_lh = time_series_lh.get_data()
+    time_series_data_lh = time_series_data_lh[:, 0, 0, :]
 
+    time_series_rh = nib.load(args.rh_time_series)
+    time_series_data_rh = time_series_rh.get_data()
+    time_series_data_rh = time_series_data_rh[:, 0, 0, :]
+
+    # load confounder data
+    n = time_series_data_rh.shape[1]
+    confounders = np.ones([1, n])
+
+    # TODO: remove magic numbers
     if not args.motion == '':
         confounders = np.concatenate([confounders, np.genfromtxt(args.motion, dtype=np.float64).T[1:7, :]])
 
@@ -86,18 +96,9 @@ def main():
         confounders = np.concatenate([confounders, np.genfromtxt(args.vcsf, dtype=np.float64).T[0:5, :]])
 
     if not args.gsl == '':
-        confounders = np.concatenate([confounders, np.genfromtxt(args.gsl).reshape([1, 300])])
+        confounders = np.concatenate([confounders, np.genfromtxt(args.gsl).reshape([1, n])])
 
     confounders = confounders.T
-
-    # load time series for left and right hemispheres
-    time_series_lh = nib.load(args.lh_time_series)
-    time_series_data_lh = time_series_lh.get_data()
-    time_series_data_lh = time_series_data_lh[:, 0, 0, :]
-
-    time_series_rh = nib.load(args.rh_time_series)
-    time_series_data_rh = time_series_rh.get_data()
-    time_series_data_rh = time_series_data_rh[:, 0, 0, :]
 
     XTX_inverse = np.linalg.inv(np.dot(confounders.T, confounders))
     P = np.dot(np.dot(confounders, XTX_inverse), confounders.T) 
