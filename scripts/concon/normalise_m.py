@@ -74,6 +74,7 @@ def main():
                coords[i,0] = np.double(words[2])
                coords[i,1] = np.double(words[3])
                coords[i,2] = np.double(words[4])
+
                i = i + 1
 
         # rewind file to read again

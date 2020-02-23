@@ -44,7 +44,7 @@ def main():
         else:
             parser.error('The file "{0}" already exists. Use -f to overwrite it.'.format(args.output))
 
-    logging.info('Loading and normalising the .m surface.')
+    logging.info('Loading and normalising the .vtk surface.')
 
     with open(args.surface, 'r') as inputfile, open(args.output, 'w') as outputfile:
         section = 0

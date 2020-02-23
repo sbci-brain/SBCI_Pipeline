@@ -124,14 +124,15 @@ def main():
 
         count = 0
         for i in range(n):
-            # find the closest point and triangle of the lower resolution mesh to a given vertex on the full mesh
+            # find the closest point and triangle of the lower resolution mesh to a given vertex on the
+            # full mesh. finding the triangle first then points helps to avoid issues with sulci and gyri
             index = locators[surface_id].FindClosestPoint(points[surface_id].GetPoint(i))
 
             # snap the in point to the closest vertex on the mesh (vertex 0 on rh side is equal to the number of vertices on lh side).
             snapped[index + offset].append(i + offset)
 
             # save the original id of the vertices that were not deleted from the high resolution mesh
-            if np.array_equal(points[surface_id].GetPoint(i), surfaces[surface_id].GetPoints().GetPoint(index)):
+            if np.allclose(points[surface_id].GetPoint(i), surfaces[surface_id].GetPoints().GetPoint(index)):
                 if offset == 0:
                     leftvertex[index] = i
                 else:
@@ -149,10 +150,11 @@ def main():
 
     # make sure nothing went wrong
     if not n == surf_n:
-        logging.info('Warning: Mesh and mapping have different number of points.')
+        logging.warning('Warning: Mesh and mapping have different number of points.')
 
-    if np.sum(leftvertex < 0) + np.sum(rightvertex < 0) > 0:
-        logging.info('Warning: Not all points correspond to higher resolution mesh.')
+    error = np.sum(leftvertex < 0) + np.sum(rightvertex < 0)
+    if error > 0:
+        logging.warning('Warning: Not all points ({0}) correspond to higher resolution mesh.'.format(str(error)))
 
     # save the shape of the original and new mesh
     shape = np.array([surf_n, lh_surf_n, rh_surf_n, orig_n, lh_orig_n, rh_orig_n])

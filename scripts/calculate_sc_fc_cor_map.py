@@ -102,7 +102,7 @@ def main():
             sc_row = np.concatenate((np.transpose(sc[0:lower, i]), sc[i, upper:]))
 
         if args.conditional > 1:
-            conditional_msk = sc_row > 0
+            conditional_msk = sc_row >= 1
             
             # if not enough connections, set correlation to 0 and move on
             if (sc[i,i] == 0) or (np.sum(conditional_msk) < args.conditional):
