@@ -22,6 +22,12 @@ def _build_args_parser():
     p.add_argument('--rh_annot', action='store', metavar='RH_ANNOT', required=True,
                    type=str, help='Path of the .annot file for the right hemisphere.')
 
+    p.add_argument('--lh_mask', action='store', metavar='LH_MASK', required=False, default=None,
+                   type=str, help='Path of the .npz file for the left hemisphere mask.')
+
+    p.add_argument('--rh_mask', action='store', metavar='RH_MASK', required=False, default=None,
+                   type=str, help='Path of the .npz file for the right hemisphere mask.')
+
     p.add_argument('--mesh', action='store', metavar='MESH', required=True,
                    type=str, help='Path to the downsampled mesh mapping .npz file.')
 
@@ -59,6 +65,22 @@ def main():
     # load annotation files
     lh_annot = read_annot(args.lh_annot)
     rh_annot = read_annot(args.rh_annot)
+
+    if not args.lh_mask == None:
+        logging.info('Adding mask to LH.')
+        
+        mask = np.load(args.lh_mask, allow_pickle=True)['mask']
+        lh_annot[0][mask == 1] = -1
+
+    if not args.rh_mask == None:
+        logging.info('Adding mask to RH.')
+
+        mask = np.load(args.rh_mask, allow_pickle=True)['mask']
+        
+        logging.info('MASK {0}'.format(np.sum(mask == 1)))
+        logging.info('LABL {0}'.format(np.sum(rh_annot[0] == -1)))
+
+        rh_annot[0][mask == 1] = -1
 
     # load mapping
     mesh = np.load(args.mesh, allow_pickle=True)
