@@ -14,9 +14,6 @@
 ##########################
 SRUN=srun
 
-# intitial seed for RNG
-RNG=0
-
 # number of seeds to generate 
 # for each hemisphere in 1000s
 N_SEED=$1
@@ -25,7 +22,10 @@ N_SEED=$1
 # surface for surface flow
 STEPS=$2
 
-ID=${N_SEED}k_n${STEPS}
+# intitial seed for RNG
+RNG=$3
+
+ID=${N_SEED}k_n${STEPS}_seed${RNG}
 
 cd dwi_psc_connectome
 
