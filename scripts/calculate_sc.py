@@ -24,6 +24,9 @@ def _build_args_parser():
     p.add_argument('--output', action='store', metavar='OUTPUT', required=True,
                    type=str, help='Path of the .npz file of structural connectivity matrix.')
 
+    p.add_argument('--count', action='store_true', dest='count',
+                   help='If set, SC is calculated as total count instead of mean count.')
+
     p.add_argument('-f', action='store_true', dest='overwrite',
                    help='If set, overwrite files if they already exist.')
 
@@ -56,6 +59,11 @@ def main():
 
     mapping = mesh['mapping']
     shape = mesh['shape']
+
+    areas = np.empty(shape[0])
+
+    for i in range(shape[0]):
+      areas[i] = len(mapping[i])
 
     # load intersections that have already been snapped to nearest vertices of full mesh
     intersections = np.load(args.intersections, allow_pickle=True)
@@ -92,6 +100,21 @@ def main():
         # only count self connections once
         if not id_in[i] == id_out[i]:
             sc_matrix[id_out[i], id_in[i]] += 1
+
+    # get the mean connectivity
+    for i in range(shape[0]):
+        area_a = areas[i]
+
+        for j in range(i, shape[0]):
+            if i == j:
+                sc_matrix[i, j] = 0
+                continue
+
+            if args.count == False:
+                area_b = areas[j]
+                sc_matrix[i, j] = sc_matrix[i, j] / (area_a * area_b)
+            
+            sc_matrix[j, i] = sc_matrix[i, j]
 
     # save results
     sparse.save_npz(args.output, sc_matrix.tocsr())

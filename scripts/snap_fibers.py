@@ -106,6 +106,9 @@ def main():
     id_out = np.empty(n)
 
     for i in xrange(n):
+        if surf_ids0[i] > 1 or surf_ids1[i] > 1:
+            continue
+
         surface_id_in = surf_ids0[i]
 
         # snap the in point to the closest vertex on the mesh
