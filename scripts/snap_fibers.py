@@ -90,15 +90,15 @@ def main():
     surfaces = initialise_surfaces(args.surfaces)
 
     # load the intersections file
-    cut = np.load(args.intersections, allow_pickle=True)
-    n = len(cut['tri_ids0'])
+    intersections = np.load(args.intersections, allow_pickle=True)
+    n = len(intersections['tri_ids0'])
 
-    surf_ids0 = cut['surf_ids0']
-    surf_ids1 = cut['surf_ids1']
-    tri_ids0 = cut['tri_ids0']
-    tri_ids1 = cut['tri_ids1']
-    pts0 = cut['pts0']
-    pts1 = cut['pts1']
+    surf_ids0 = intersections['surf_ids0']
+    surf_ids1 = intersections['surf_ids1']
+    tri_ids0 = intersections['tri_ids0']
+    tri_ids1 = intersections['tri_ids1']
+    pts0 = intersections['pts0']
+    pts1 = intersections['pts1']
 
     logging.info('Snapping intersections to nearest vertices.')
 
@@ -129,9 +129,9 @@ def main():
     # save the results
     np.savez_compressed(args.output,
                         v_ids0=id_in,
-                        surf_ids0=cut['surf_ids0'],
+                        surf_ids0=surf_ids0,
                         v_ids1=id_out,
-                        surf_ids1=cut['surf_ids1'])
+                        surf_ids1=surf_ids1)
 
 
 if __name__ == "__main__":
