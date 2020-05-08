@@ -20,8 +20,8 @@ def _build_args_parser():
     p.add_argument('--rh_surface', action='store', metavar='RH_SURFACE', required=True,
                    type=str, help='Path of the high resolution sphere .vtk mesh file for the right hemisphere.')
 
-    p.add_argument('--intersections', action='store', metavar='INTERSECTIONS', required=True,
-                   type=str, help='Path of the .npz file of snapped intersections.')
+    p.add_argument('--intersections', nargs='+', default=[], required=True,
+                   type=str, help='Path of the .npz files of intersections that have been snapped to nearest vertices.')
 
     p.add_argument('--output', action='store', metavar='OUTPUT', required=True,
                    type=str, help='Path of the .tsv file to save the output to (concon format).')
@@ -62,8 +62,9 @@ def main():
         parser.error('The file "{0}" must exist.'.format(args.rh_surface))
 
     # make sure the intersections.npz file exists
-    if not isfile(args.intersections):
-        parser.error('The file "{0}" must exist.'.format(args.intersections))
+    for intersections in args.intersections:
+        if not isfile(intersections):
+            parser.error('The file "{0}" must exist.'.format(intersections))
 
     # make sure files are not overwritten by accident
     if isfile(args.output):
@@ -76,60 +77,74 @@ def main():
     logging.info('Loading the .vtk surfaces and snapped intersections data.')
     surfaces = initialise_surfaces([args.lh_surface, args.rh_surface])
 
-    # load the intersections file
-    intersections = np.load(args.intersections, allow_pickle=True)
-
-    pts_in = intersections['v_ids0']
-    pts_out = intersections['v_ids1']
-    surf_in = intersections['surf_ids0']
-    surf_out = intersections['surf_ids1']
-
-    # subcortical regions not yet supported
-    mask = (surf_in <= 1) & (surf_out <= 1)
-    pts_in = pts_in[mask]
-    pts_out = pts_out[mask]
-    surf_in = surf_in[mask]
-    surf_out = surf_out[mask]
-
-    n = len(pts_in)
-    result = np.empty((n, 10), dtype='O')
+    result = np.empty(10, dtype='O')
 
     logging.info('Converting snapped intersections to spherical coordinates (concon format).')
 
+    # total number of fibers
+    N = 0
+
     with open(args.output, 'w') as outfile:
-        outfile.write("#%i\n" % (n))
-        
+      for intersections_file in args.intersections:
+        # load the intersections file
+        logging.info('Processing intersections from: ' + intersections_file)
+        intersections = np.load(intersections_file, allow_pickle=True)
+
+        pts_in = intersections['v_ids0']
+        pts_out = intersections['v_ids1']
+        surf_in = intersections['surf_ids0']
+        surf_out = intersections['surf_ids1']
+
+        # subcortical regions not yet supported
+        mask = (surf_in <= 1) & (surf_out <= 1)
+        pts_in = pts_in[mask]
+        pts_out = pts_out[mask]
+        surf_in = surf_in[mask]
+        surf_out = surf_out[mask]
+
+        n = len(pts_in)
+ 
         for i in range(n):
-            surface_id = surf_in[i]
+          surface_id = surf_in[i]
 
-            norm = surfaces[surface_id].GetPoint(int(pts_in[i]))
-            area = np.sqrt(norm[0]*norm[0] + norm[1]*norm[1] + norm[2]*norm[2])
+          norm = surfaces[surface_id].GetPoint(int(pts_in[i]))
+          area = np.sqrt(norm[0]*norm[0] + norm[1]*norm[1] + norm[2]*norm[2])
 
-            norm = norm / area
+          norm = norm / area
 
-            result[i,0] = 0
-            result[i,1] = int(1 - surf_in[i])
-            result[i,2:5] = norm
+          result[0] = 0
+          result[1] = int(1 - surf_in[i])
+          result[2:5] = norm
 
-            ################################
+          ################################
 
-            surface_id = surf_out[i]
+          surface_id = surf_out[i]
 
-            norm = surfaces[surface_id].GetPoint(int(pts_out[i]))
-            area = np.sqrt(norm[0]*norm[0] + norm[1]*norm[1] + norm[2]*norm[2])
+          norm = surfaces[surface_id].GetPoint(int(pts_out[i]))
+          area = np.sqrt(norm[0]*norm[0] + norm[1]*norm[1] + norm[2]*norm[2])
 
-            norm = norm / area
+          norm = norm / area
+  
+          result[5] = 0
+          result[6] = int(1 - surf_out[i])
+          result[7:10] = norm
+
+          outfile.write("%i\t %i\t %f\t %f\t %f\t %i\t %i\t %f\t %f\t %f\n" % (result[0], result[1], result[2], result[3], result[4],
+                                                                               result[5], result[6], result[7], result[8], result[9]))
+  
+          if i % 100000 == 0:
+              logging.info('Processing intersection: ' + str(N + i))
+
+        N = N + n
+
+    # need to append the total fiber count to the first line
+    with open(args.output, 'r+') as outfile:
+      file_contents = outfile.read()
+
+      outfile.seek(0, 0)
+      outfile.write("#%i\n" % (N))
+      outfile.write(file_contents)
     
-            result[i,5] = 0
-            result[i,6] = int(1 - surf_out[i])
-            result[i,7:10] = norm
 
-            outfile.write("%i\t %i\t %f\t %f\t %f\t %i\t %i\t %f\t %f\t %f\n" % (result[i,0], result[i,1], result[i,2], result[i,3], result[i,4],
-                                                                                 result[i,5], result[i,6], result[i,7], result[i,8], result[i,9]))
-    
-            if i % 100000 == 0:
-                logging.info('Processing intersection: ' + str(i))
-
-    
 if __name__ == "__main__":
     main()
