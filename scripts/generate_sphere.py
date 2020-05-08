@@ -103,9 +103,9 @@ def main():
         firstface = True
 
         for i in point_ids:
-            a = str(delny.points[i, 0]))
-            b = str(delny.points[i, 1]))
-            c = str(delny.points[i, 2]))
+            a = str(delny.points[i, 0])
+            b = str(delny.points[i, 1])
+            c = str(delny.points[i, 2])
 
             outputfile.write(string.join([a,b,c], sep = ' ') + ' ')
 
