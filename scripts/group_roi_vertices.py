@@ -66,21 +66,34 @@ def main():
     lh_annot = read_annot(args.lh_annot)
     rh_annot = read_annot(args.rh_annot)
 
+    lh_labels = np.array(lh_annot[0])
+    rh_labels = np.array(rh_annot[0])
+
+    # create the ROI name arrays, skipping those that are not included on the mesh
+    idx = np.unique(lh_labels)
+    lh_names = np.concatenate((np.array(lh_annot[2]), ['unknown']))[idx]
+
+    idx = np.unique(rh_labels)
+    rh_names = np.concatenate((np.array(rh_annot[2]), ['unknown']))[idx]
+
+    # make sure the label ids correspond to the array indices of the names
+    lh_label_map = dict(zip(np.unique(lh_labels), range(len(np.unique(lh_labels)))))
+    lh_labels = np.array([lh_label_map[i] for i in lh_labels])
+
+    rh_label_map = dict(zip(np.unique(rh_labels), range(len(np.unique(rh_labels)))))
+    rh_labels = np.array([rh_label_map[i] for i in rh_labels])
+
     if not args.lh_mask == None:
         logging.info('Adding mask to LH.')
         
         mask = np.load(args.lh_mask, allow_pickle=True)['mask']
-        lh_annot[0][mask == 1] = -1
+        lh_labels[mask == 1] = 0
 
     if not args.rh_mask == None:
         logging.info('Adding mask to RH.')
 
         mask = np.load(args.rh_mask, allow_pickle=True)['mask']
-        
-        logging.info('MASK {0}'.format(np.sum(mask == 1)))
-        logging.info('LABL {0}'.format(np.sum(rh_annot[0] == -1)))
-
-        rh_annot[0][mask == 1] = -1
+        rh_labels[mask == 1] = 0
 
     # load mapping
     mesh = np.load(args.mesh, allow_pickle=True)
@@ -88,12 +101,21 @@ def main():
     mapping = mesh['mapping']
     shape = mesh['shape']
 
+    logging.info('Number of LH vertices: {0}'.format(shape[1]))
+    logging.info('Number of RH vertices: {0}'.format(shape[2]))
+
     # set the label to the most frequent found in each mapping
-    lh_vertices = [stats.mode(lh_annot[0][mapping[i]])[0][0] for i in range(shape[1])]
-    rh_vertices = [stats.mode(rh_annot[0][mapping[i] - shape[4]])[0][0] for i in range(shape[1], shape[0])]
+    lh_vertices = np.array([stats.mode(lh_labels[mapping[i]])[0][0] for i in range(shape[1])])
+    rh_vertices = np.array([stats.mode(rh_labels[mapping[i] - shape[4]])[0][0] for i in range(shape[1], shape[0])]) + 10000
+
+    logging.info('Number of LH ROIs: {0}'.format(len(np.unique(lh_vertices))))
+    logging.info('Number of RH ROIs: {0}'.format(len(np.unique(rh_vertices))))
 
     # group vertices by ROI
     new_order = np.concatenate([np.argsort(lh_vertices), np.argsort(rh_vertices) + shape[1]])
+
+    lh_names = ['LH_' + name for name in lh_names]
+    rh_names = ['RH_' + name for name in rh_names]
 
     # save the results
     np.savez_compressed(args.output,
@@ -102,8 +124,8 @@ def main():
                         rh_labels=rh_vertices,
                         lh_colors=lh_annot[1],
                         rh_colors=rh_annot[1],
-                        lh_names=np.array(lh_annot[2]),
-                        rh_names=np.array(rh_annot[2]))
+                        lh_names=lh_names,
+                        rh_names=rh_names)
 
 
 if __name__ == "__main__":
