@@ -69,7 +69,6 @@ def main():
 
     # calculate continuous fc a each given roi in the current mapping
     for i in range(shape[0]):
-        logging.info('Calculating FC for ROI: {0}'.format(i))
         roi_a = time_series_data[mapping[i], :]
         roi_a = roi_a[~np.all(roi_a == 0, axis=1)]
 

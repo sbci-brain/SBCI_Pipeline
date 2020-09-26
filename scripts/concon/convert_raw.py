@@ -22,7 +22,7 @@ def _build_args_parser():
                    type=str, help='Path to the mapping for the resolution of the surfacecs (.npz).')
 
     p.add_argument('--output', action='store', metavar='OUTPUT', required=True,
-                   type=str, help='Path of the .npz file to output.')
+                   type=str, help='Path of the .mat file to output.')
 
     p.add_argument('-f', action='store_true', dest='overwrite',
                    help='If set, overwrite files if they already exist.')
@@ -40,7 +40,7 @@ def main():
         parser.error('The file "{0}" must exist.'.format(args.input))
 
     if not isfile(args.mesh):
-        parser.error('The file "{0}" must exist.'.format(args.input))
+        parser.error('The file "{0}" must exist.'.format(args.mesh))
 
     # make sure files are not accidently overwritten
     if isfile(args.output):
@@ -84,7 +84,8 @@ def main():
     kernel[0:shape[1],shape[1]:] = C
 
     # save the results
-    scio.savemat(args.output + '.mat', {'kernel': kernel})
+    #scio.savemat(args.output, {'sc': np.triu(kernel}))
+    scio.savemat(args.output + '.mat', {'sc': kernel})
     sparse.save_npz(args.output + '.npz', sparse.csr_matrix(kernel))
 
 if __name__ == "__main__":

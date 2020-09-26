@@ -3,6 +3,8 @@ import logging
 import nibabel as nib
 import numpy as np
 
+import scipy.io as scio
+
 from os.path import isfile
 
 DESCRIPTION = """
@@ -25,6 +27,9 @@ def _build_args_parser():
 
     p.add_argument('--output', action='store', metavar='OUTPUT', required=True,
                    type=str, help='Path of the .npz file to save the output to.')
+
+    p.add_argument('--mask_indices', type=int, nargs='+', default=[-1],
+                   help='List of freesurfer label indices to ignore when calculating connectivity.')
 
     p.add_argument('-f', action='store_true', dest='overwrite',
                    help='If set, overwrite files if they already exist.')
@@ -61,9 +66,11 @@ def main():
 
     # load atlas
     atlas = np.load(args.atlas, allow_pickle=True)
-    grouping = np.concatenate((atlas['lh_labels'], atlas['rh_labels'] + 10000))
-    rois = np.unique(grouping)
-    rois = rois[(rois != -1) & (rois != 9999)]
+    mask = np.isin(atlas['fs_labels'], args.mask_indices, invert=True)
+    grouping = atlas['sbci_labels']
+
+    rois = np.unique(grouping[mask])
+    n = len(rois)
 
     # load time series for left and right hemispheres
     logging.info('Loading timeseries data.')
@@ -76,7 +83,7 @@ def main():
     areas = np.empty(shape[0])
 
     # calculate mean signal at each 
-    # vertice given the current mapping
+    # vertex given the current mapping
     for i in range(shape[0]):
         vertex = mapping[i]
         mean_time_series[i, :] = np.mean(time_series_data[vertex, :], axis=0)
@@ -94,14 +101,13 @@ def main():
 
     # calculate continuous fc a each given roi in the current mapping
     for i in range(n):
-        logging.info('Calculating FC for ROI: {0}'.format(rois[i]))
         mask = (grouping == rois[i])
         roi_a = mean_time_series[mask, :]
         area_a = areas[mask]
 
         X_mX = roi_a - roi_a.mean(axis=1).reshape((-1, 1))
         ssX = (X_mX**2).sum(axis=1).reshape((-1, 1))
-        
+
         for j in range(i, n):
             if i == j:
                 result[i, j] = 0
@@ -120,11 +126,12 @@ def main():
 
             # in the unlikely case of perfect correlation, atanh is not defined
             fisher_corr = np.arctanh(corr.clip(-1+1e-15,1-1e-15))
-            fisher_corr = np.sum(fisher_corr * area_ab) / (sum(area_a) * sum(area_b))
+            fisher_corr = np.nansum(fisher_corr * area_ab) / (sum(area_a) * sum(area_b))
             result[i, j] = np.tanh(fisher_corr)
 
     # save the results
-    np.savez_compressed(args.output, fc=result)
+    scio.savemat(args.output, {'fc': result})
+    #np.savez_compressed(args.output, fc=result)
 
 
 if __name__ == "__main__":

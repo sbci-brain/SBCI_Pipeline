@@ -3,6 +3,8 @@ import logging
 import numpy as np
 import vtk
 
+import scipy.io as scio
+
 from scipy import sparse
 from os.path import isfile
 
@@ -26,6 +28,9 @@ def _build_args_parser():
 
     p.add_argument('--output', action='store', metavar='OUTPUT', required=True,
                    type=str, help='Path of the .npz file of structural connectivity matrix.')
+
+    p.add_argument('--mask_indices', type=int, nargs='+', default=[-1],
+                   help='List of freesurfer label indices to ignore when calculating connectivity.')
 
     p.add_argument('--count', action='store_true', dest='count',
                    help='If set, SC is calculated as total count instead of mean count.')
@@ -66,9 +71,11 @@ def main():
 
     # load atlas
     atlas = np.load(args.atlas, allow_pickle=True)
-    grouping = np.concatenate((atlas['lh_labels'], atlas['rh_labels'] + 10000))
-    rois = np.unique(grouping)
-    rois = rois[(rois != -1) & (rois != 9999)]
+    mask = np.isin(atlas['fs_labels'], args.mask_indices, invert=True)
+    grouping = atlas['sbci_labels']
+
+    rois = np.unique(grouping[mask])
+    n = len(rois)
 
     # load mapping
     mesh = np.load(args.mesh, allow_pickle=True)
@@ -80,8 +87,6 @@ def main():
     for i in range(shape[0]):
       areas[i] = len(mapping[i])
 
-    n = len(rois)
-
     logging.info('Calculating SC for ' + str(n) + ' rois.')
 
     # initialise an array to fill in the loop
@@ -89,7 +94,7 @@ def main():
     
     # normalise as is defined for continuous SC
     np.fill_diagonal(sc, 0)
-    sc = sc / np.sum(sc)
+    #sc = sc / np.sum(sc)
 
     # calculate the structural connectivity
     for i in range(n):
@@ -117,7 +122,9 @@ def main():
                 sc_matrix[i, j] = np.sum(region_sc * area_ab) / (sum(area_a) * sum(area_b))
 
     # save results
-    np.savez_compressed(args.output, sc=sc_matrix)
+    #np.save(args.output, sc_matrix)
+    #np.savez_compressed(args.output, sc=sc_matrix)
+    scio.savemat(args.output, {'sc': sc_matrix})
 
 
 if __name__ == "__main__":

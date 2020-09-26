@@ -72,9 +72,9 @@ def main():
 
     # load atlas
     atlas = np.load(args.atlas, allow_pickle=True)
-    grouping = np.concatenate((atlas['lh_labels'], atlas['rh_labels'] + 10000))
+    grouping = np.concatenate((atlas['lh_labels'], atlas['rh_labels']))
     rois = np.unique(grouping)
-    rois = rois[(rois != -1) & (rois != 9999)]
+    #rois = rois[(rois != -1) & (rois != 9999)]
 
     logging.info('Loading timeseries data.')
 
@@ -103,7 +103,6 @@ def main():
 
     # calculate fc a each given roi in the current mapping
     for i in range(n):
-        logging.info('Calculating FC for ROI: {0}'.format(rois[i]))
         mask = (grouping == rois[i])
         roi_a = mean_time_series[mask, :]
 

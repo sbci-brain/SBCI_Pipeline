@@ -3,6 +3,8 @@ import logging
 import nibabel as nib
 import numpy as np
 
+import scipy.io as scio
+
 from os.path import isfile
 
 DESCRIPTION = """
@@ -101,8 +103,12 @@ def main():
         # used for upper triangular indices
         index += offset-1
 
+    result = np.zeros((n,n))
+    result[np.triu_indices(n)] = fc
+
     # save the results
-    np.savez_compressed(args.output, time_series=mean_time_series, fc=fc)
+    scio.savemat(args.output, {'fc': result})
+    #np.savez_compressed(args.output, time_series=mean_time_series, fc=fc)
 
 
 if __name__ == "__main__":
