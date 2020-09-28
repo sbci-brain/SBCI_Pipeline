@@ -15,8 +15,11 @@ def _build_args_parser():
     p = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                 description=DESCRIPTION)
 
-    p.add_argument('--surfaces', type=str, nargs='+', default=[], required=True,
-                   help='List of surfaces used during SET (.vtk)')
+    p.add_argument('--lh_surface', action='store', metavar='LH_SURFACE_HI', required=True,
+                   type=str, help='Path of the high resolution .vtk mesh file for the left hemisphere.')
+
+    p.add_argument('--rh_surface', action='store', metavar='RH_SURFACE_HI', required=True,
+                   type=str, help='Path of the high resolution .vtk mesh file for the right hemisphere.')
 
     p.add_argument('--intersections', action='store', metavar='INTERSECTIONS', required=True,
                    type=str, help='Path of the .npz file of intersections output by SET.')
@@ -37,17 +40,6 @@ def load_vtk(filename):
     reader.Update()
 
     return reader.GetOutput()
-
-
-# load all the required surfaces
-def initialise_surfaces(surface_files):
-    surfaces = dict()
-
-    # load all surfaces
-    for i, filename in enumerate(surface_files):
-        surfaces[i] = load_vtk(filename)
-
-    return surfaces
 
 
 # snap the given point to the nearest vertex of the given triangle
@@ -71,12 +63,9 @@ def main():
 
     # make sure all the given files exist
     logging.info('Loading .vtk surfaces, mapping, and intersections.')
-    for filename in args.surfaces:
+    for filename in [args.lh_surface, args.rh_surface, args.intersections]:
         if not isfile(filename):
             parser.error('The file "{0}" must exist.'.format(filename))
-
-    if not isfile(args.intersections):
-        parser.error('The file "{0}" must exist.'.format(args.intersections))
 
     # make sure that files are not accidently overwritten
     if isfile(args.output):
@@ -87,14 +76,20 @@ def main():
 
     # load the surfaces
     logging.info('Loading .vtk surfaces and intersections.')
-    surfaces = initialise_surfaces(args.surfaces)
+
+    # load all surfaces
+    surfaces = dict()
+    surfaces[0] = load_vtk(args.lh_surface)
+    surfaces[1] = load_vtk(args.rh_surface)
+
+    # triangle indices
+    lh_limit = surfaces[0].GetNumberOfCells() - 1
+    rh_limit = surfaces[0].GetNumberOfCells() + surfaces[1].GetNumberOfCells() - 1
 
     # load the intersections file
     intersections = np.load(args.intersections, allow_pickle=True)
     n = len(intersections['tri_ids0'])
 
-    surf_ids0 = intersections['surf_ids0']
-    surf_ids1 = intersections['surf_ids1']
     tri_ids0 = intersections['tri_ids0']
     tri_ids1 = intersections['tri_ids1']
     pts0 = intersections['pts0']
@@ -106,17 +101,17 @@ def main():
     id_out = np.empty(n)
 
     for i in xrange(n):
-        if surf_ids0[i] > 1 or surf_ids1[i] > 1:
+        if tri_ids0[i] > rh_limit or tri_ids1 > rh_limit:
             continue
-
-        surface_id_in = surf_ids0[i]
+        
+        surface_id_in = 0 if tri_ids0 <= lh_limit else 1
 
         # snap the in point to the closest vertex on the mesh
         index_in = snap_to_closest_vertex(surfaces[surface_id_in].GetCell(tri_ids0[i]), pts0[i])
 
         ################################
 
-        surface_id_out = surf_ids1[i]
+        surface_id_out = 0 if tri_ids1 <= lh_limit else 1
 
         # snap the out point to the closest vertex on the mesh
         index_out = snap_to_closest_vertex(surfaces[surface_id_out].GetCell(tri_ids1[i]), pts1[i])
@@ -129,9 +124,7 @@ def main():
     # save the results
     np.savez_compressed(args.output,
                         v_ids0=id_in,
-                        surf_ids0=surf_ids0,
-                        v_ids1=id_out,
-                        surf_ids1=surf_ids1)
+                        v_ids1=id_out)
 
 
 if __name__ == "__main__":

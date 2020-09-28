@@ -102,20 +102,29 @@ def main():
     shape = mesh['shape']
 
     # load the intersections that have already been snapped to nearest vertices of full mesh
-    cut = np.load(args.intersections, allow_pickle=True)
+    intersections = np.load(args.intersections, allow_pickle=True)
 
-    surf_ids0 = cut['surf_ids0'].astype(np.int64)
-    surf_ids1 = cut['surf_ids1'].astype(np.int64)
-    pts0 = cut['v_ids0'].astype(np.int64)
-    pts1 = cut['v_ids1'].astype(np.int64)
+    # triangle indices
+    lh_limit = surfaces[0].GetNumberOfCells() - 1
+    rh_limit = surfaces[0].GetNumberOfCells() + surfaces[1].GetNumberOfCells() - 1
+
+    tri_ids0 = intersections['tri_ids0'].astype(np.int64)
+    tri_ids1 = intersections['tri_ids1'].astype(np.int64)
+    pts0 = intersections['v_ids0'].astype(np.int64)
+    pts1 = intersections['v_ids1'].astype(np.int64)
 
     # only keep the white matter surfaces from the intersections 
     # file and map rh vertex ids to the full brain indices
-    pts0[surf_ids0 == 1] = pts0[surf_ids0 == 1] + shape[4]
-    pts1[surf_ids1 == 1] = pts1[surf_ids1 == 1] + shape[4]
+    rh_surface_mask_in = (tri_ids0 > lh_limit) & (tri_ids0 <= rh_limit)
+    rh_surface_mask_out = (tri_ids1 > lh_limit) & (tri_ids1 <= rh_limit)
 
-    pts0 = pts0[(surf_ids0 <= 1) & (surf_ids1 <= 1)]
-    pts1 = pts1[(surf_ids0 <= 1) & (surf_ids1 <= 1)]
+    id_in[rh_surface_mask_in] = id_in[rh_surface_mask_in] + shape[4]
+    id_out[rh_surface_mask_out] = id_out[rh_surface_mask_out] + shape[4]
+
+    surface_mask = (tri_ids0 <= rh_limit) & (tri_ids1 <= rh_limit)
+
+    pts0 = id_in[surface_mask]
+    pts1 = id_out[surface_mask]
 
     # prepare vairables for the loop
     id_in_buf = pts0.copy()

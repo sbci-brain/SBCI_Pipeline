@@ -73,17 +73,20 @@ def main():
     # load intersections that have already been snapped to nearest vertices of full mesh
     intersections = np.load(args.intersections, allow_pickle=True)
 
-    id_in = intersections['v_ids0']
-    id_out = intersections['v_ids1']
-    surf_in = intersections['surf_ids0']
-    surf_out = intersections['surf_ids1']
+    tri_ids0 = intersections['tri_ids0'].astype(np.int64)
+    tri_ids1 = intersections['tri_ids1'].astype(np.int64)
+    id_in = intersections['v_ids0'].astype(np.int64)
+    id_out = intersections['v_ids1'].astype(np.int64)
 
     # only keep the white matter surfaces from the intersections 
     # file and map rh vertex ids to the full brain indices
-    id_in[surf_in == 1] = id_in[surf_in == 1] + shape[4]
-    id_out[surf_out == 1] = id_out[surf_out == 1] + shape[4]
+    rh_surface_mask_in = (tri_ids0 > lh_limit) & (tri_ids0 <= rh_limit)
+    rh_surface_mask_out = (tri_ids1 > lh_limit) & (tri_ids1 <= rh_limit)
 
-    surface_mask = (surf_in <= 1) & (surf_out <= 1)
+    id_in[rh_surface_mask_in] = id_in[rh_surface_mask_in] + shape[4]
+    id_out[rh_surface_mask_out] = id_out[rh_surface_mask_out] + shape[4]
+
+    surface_mask = (tri_ids0 <= rh_limit) & (tri_ids1 <= rh_limit)
 
     id_in = id_in[surface_mask]
     id_out = id_out[surface_mask]
