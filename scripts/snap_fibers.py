@@ -97,34 +97,50 @@ def main():
 
     logging.info('Snapping intersections to nearest vertices.')
 
-    id_in = np.empty(n)
-    id_out = np.empty(n)
+    all_id_in = np.empty(n)
+    all_id_out = np.empty(n)
+    surf_ids_in = np.empty(n)
+    surf_ids_out = np.empty(n)
+
+    filter_arr = np.ones(n, dtype=bool)
+
+    logging.info(rh_limit)
 
     for i in xrange(n):
-        if tri_ids0[i] > rh_limit or tri_ids1 > rh_limit:
+        id_in = tri_ids0[i]
+        id_out = tri_ids1[i]
+
+        if id_in > rh_limit or id_out > rh_limit:
+            filter_arr[i] = False
             continue
         
-        surface_id_in = 0 if tri_ids0 <= lh_limit else 1
+        surface_id_in = 0 if id_in <= lh_limit else 1
+	id_in = id_in - surface_id_in*lh_limit
 
         # snap the in point to the closest vertex on the mesh
-        index_in = snap_to_closest_vertex(surfaces[surface_id_in].GetCell(tri_ids0[i]), pts0[i])
+        index_in = snap_to_closest_vertex(surfaces[surface_id_in].GetCell(id_in), pts0[i])
 
         ################################
 
-        surface_id_out = 0 if tri_ids1 <= lh_limit else 1
+        surface_id_out = 0 if id_out <= lh_limit else 1
+	id_out = id_out - surface_id_out*lh_limit
 
         # snap the out point to the closest vertex on the mesh
-        index_out = snap_to_closest_vertex(surfaces[surface_id_out].GetCell(tri_ids1[i]), pts1[i])
+        index_out = snap_to_closest_vertex(surfaces[surface_id_out].GetCell(id_out), pts1[i])
 
-        id_in[i] = index_in
-        id_out[i] = index_out
+        all_id_in[i] = index_in
+        all_id_out[i] = index_out
+        surf_ids_in[i] = surface_id_in
+        surf_ids_out[i] = surface_id_out
 
     logging.info('Saving results.')
 
     # save the results
     np.savez_compressed(args.output,
-                        v_ids0=id_in,
-                        v_ids1=id_out)
+                        v_ids0=all_id_in[filter_arr],
+                        v_ids1=all_id_out[filter_arr],
+                        surf_ids0=surf_ids_in[filter_arr],
+                        surf_ids1=surf_ids_out[filter_arr])
 
 
 if __name__ == "__main__":

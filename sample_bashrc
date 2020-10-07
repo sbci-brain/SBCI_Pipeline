@@ -1,0 +1,19 @@
+# .bashrc
+
+module load dcm2niix freesurfer fsl 
+module load matlab/r2017b libpng/1.2.50 mrtrix3/b2 gsl/2.4/b1 
+module load java pigz git
+
+module load gcc/6.4.0 eigen/3.3.2 cmake/3.11.1/b1
+
+export FREESURFER_HOME="/software/freesurfer/6.0.0/freesurfer"
+
+export ANTSPATH="/software/ants/2.3.1/bin/"
+export PATH=${ANTSPATH}:$PATH
+export PATH="/home/mcole22/dwi_pipeline/ANTs/Scripts:$PATH"
+export PATH="/software/freesurfer/6.0.0/freesurfer/fsfast/bin:$PATH"
+export PATH="/software/freesurfer/6.0.0/freesurfer/fsfast/toolbox:$PATH"
+
+source /software/freesurfer/6.0.0/freesurfer/SetUpFreeSurfer.sh
+
+conda activate sbci
