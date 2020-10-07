@@ -7,4 +7,3 @@ What you will need:
 1. T1w anatomical data
 2. Multi-shell dwi data
 3. Resting-state fMRI data
-
