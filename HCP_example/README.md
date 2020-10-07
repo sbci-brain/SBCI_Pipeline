@@ -12,7 +12,7 @@ Edit lines 42-43 to point to the working directory:
     REFDIR=/home/user/project/subjects_dir/reference_subject/dwi_sbci_connectome/structure/fsaverage
     AVGDIR=/home/user/project/subjects_dir/SBCI_AVG
     
-Where `reference_subject` is the name of the test HCP subject (in this case 103818). Do not change anything line 42 to the right of `reference_subject` and 
+Where `reference_subject` is the name of the test HCP subject (in this case 103818). Do not change anything in line 42 to the right of `reference_subject` and 
 there is no need to change `SBCI_AVG` in line 43.
 
 Feel free to edit any other lines (like resolution or parcellations) you want so that you can get the feel of the available settings.
@@ -31,7 +31,7 @@ Each of the three .slurm files will have some combination of the following lines
     # CHANGE LOCATION TO FREESURFER WITH PERSONAL LICENSE
     fsdir=/software/freesurfer/6.0.0/freesurfer/
 
-Make the appropriate changes to 
+Make the appropriate changes to: 
 
 1. Point to your .bashrc file that sets up your Python environment with Scilpy installed and anything else required. A sample 
 .bashrc file can be found in the root directory of this repository. 
