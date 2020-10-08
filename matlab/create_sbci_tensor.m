@@ -1,3 +1,5 @@
+% MATLAB r2019b
+
 % extract atlas free tensors for each subject
 clear variables;
 close all;
@@ -16,10 +18,10 @@ foldername = 'dwi_sbci_connectome/SBCI';
 avg_path = 'SBCI_AVG';
 
 % percent reduction of the vertices in the surface meshes in SBCI
-reduction = '99'
+reduction = '99';
 
 % number of BOLD runs
-n_runs = 4
+n_runs = 4;
 
 % atlases to collect
 atlases = [{'aparc.a2005s'}; {'aparc.a2009s'};
@@ -57,16 +59,16 @@ for i = startID:endID
     cd(processed_path)
         
     % load the data   
-    for j = 1:n_runs
-      load(sprintf('./RUN00%s/fc_partial_avg_0.%s.mat', j, reduction))           
+    for run = 1:n_runs
+      load(sprintf('./RUN00%d/fc_partial_avg_0.%d.mat', run, reduction))           
 
       % save as full matrix (not upper triangular)
-      sbci_fc_tensor(:,:,j,idx) = fc + fc' - 2*diag(diag(fc));   
+      sbci_fc_tensor(:,:,run,idx) = fc + fc' - 2*diag(diag(fc));   
     end
     
     load(sprintf('smoothed_sc_avg_0.005_0.%s.mat', reduction))
     
-    % save as normalised matrix
+    % save as normalised matrix (other versions of MATLAB use sum(sc(:))
     sbci_sc_tensor(:,:,idx) = sc / sum(sc, 'all');
     
     idx = idx + 1;                

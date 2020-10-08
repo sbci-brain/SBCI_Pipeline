@@ -1,3 +1,5 @@
+% MATLAB r2019b
+
 % extract atlas free tensors for each subject
 clear variables;
 close all;
@@ -16,7 +18,7 @@ foldername = 'dwi_sbci_connectome/SBCI';
 avg_path = 'SBCI_AVG';
 
 % number of BOLD runs
-n_runs = 4
+n_runs = 4;
 
 % atlases to collect
 atlases = [{'aparc.a2009s'}; {'aparc'};];
@@ -32,7 +34,7 @@ end
 
 for atlas_idx = 1:length(atlases)
     atlas = atlases{atlas_idx};
-    atlas_name = alt_names(atlas_idx);
+    atlas_name = alt_names{atlas_idx};
     
     idx = 1;
 
@@ -58,7 +60,7 @@ for atlas_idx = 1:length(atlases)
         
         % load the data      
         for run = 1:n_runs       
-            load(sprintf('./RUN00%s/%s_cfc.mat', j, atlas))           
+            load(sprintf('./RUN00%d/%s_cfc.mat', run, atlas_name))           
 
             fc = fc + fc';
             fc = fc - diag(diag(fc)); 
@@ -68,8 +70,8 @@ for atlas_idx = 1:length(atlases)
 
         eval(sprintf('%s_csc_tensor(:,:,idx) = sc;', atlas_name)); 
       
-        fc_names{atlas_idx} = sprintf('%s_fc_tensor ', atlas_name);
-        sc_names{atlas_idx} = sprintf('%s_sc_tensor ', atlas_name);
+        fc_names{atlas_idx} = sprintf('%s_cfc_tensor ', atlas_name);
+        sc_names{atlas_idx} = sprintf('%s_csc_tensor ', atlas_name);
         
         idx = idx + 1;               
     end
@@ -77,7 +79,7 @@ end
 
 cd(output_path);
 
-command = sprintf('save -v7.3 SBCI_CFC_%srun_atlas %s atlas_names ids', n_runs, fc_names{:});
+command = sprintf('save -v7.3 SBCI_CFC_%drun_atlas %s atlas_names ids', n_runs, fc_names{:});
 eval(command);
 command = sprintf('save -v7.3 SBCI_CSC_atlas %s atlas_names ids', sc_names{:});
 eval(sprintf('%s %s', filename, raw_fc_names{:}));
