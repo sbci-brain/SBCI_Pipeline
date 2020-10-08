@@ -79,8 +79,8 @@ end
 
 cd(output_path);
 
-command = sprintf('save -v7.3 SBCI_CFC_%drun_atlas %s atlas_names ids', n_runs, fc_names{:});
-eval(command);
-command = sprintf('save -v7.3 SBCI_CSC_atlas %s atlas_names ids', sc_names{:});
-eval(sprintf('%s %s', filename, raw_fc_names{:}));
+command = sprintf('save -v7.3 SBCI_CFC_%drun_atlas atlas_names ids', n_runs);
+eval(sprintf('%s %s', command, fc_names{:}));
+command = 'save -v7.3 SBCI_CSC_atlas atlas_names ids';
+eval(sprintf('%s %s', command, sc_names{:}));
 
