@@ -59,13 +59,13 @@ for atlas_idx = 1:length(atlases)
         sc = sc / sum(sc, 'all');
         
         % load the data      
-        for run = 1:n_runs       
-            load(sprintf('./RUN00%d/%s_cfc.mat', run, atlas_name))           
+        for j = 1:n_runs       
+            load(sprintf('./RUN00%d/%s_cfc.mat', j, atlas))           
 
             fc = fc + fc';
             fc = fc - diag(diag(fc)); 
             
-            eval(sprintf('%s_cfc_tensor(:,:,run,idx) = fc;', atlas_name));   
+            eval(sprintf('%s_cfc_tensor(:,:,j,idx) = fc;', atlas_name));   
         end
 
         eval(sprintf('%s_csc_tensor(:,:,idx) = sc;', atlas_name)); 

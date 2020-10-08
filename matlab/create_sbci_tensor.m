@@ -59,11 +59,11 @@ for i = startID:endID
     cd(processed_path)
         
     % load the data   
-    for run = 1:n_runs
-      load(sprintf('./RUN00%d/fc_partial_avg_0.%d.mat', run, reduction))           
+    for j = 1:n_runs
+      load(sprintf('./RUN00%d/fc_partial_avg_0.%d.mat', j, reduction))           
 
       % save as full matrix (not upper triangular)
-      sbci_fc_tensor(:,:,run,idx) = fc + fc' - 2*diag(diag(fc));   
+      sbci_fc_tensor(:,:,j,idx) = fc + fc' - 2*diag(diag(fc));   
     end
     
     load(sprintf('smoothed_sc_avg_0.005_0.%s.mat', reduction))
