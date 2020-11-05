@@ -84,7 +84,7 @@ def main():
 
     # triangle indices
     lh_limit = surfaces[0].GetNumberOfCells() - 1
-    rh_limit = surfaces[0].GetNumberOfCells() + surfaces[1].GetNumberOfCells() - 1
+    rh_limit = surfaces[0].GetNumberOfCells() + surfaces[1].GetNumberOfCells() - 2
 
     # load the intersections file
     intersections = np.load(args.intersections, allow_pickle=True)
@@ -104,6 +104,7 @@ def main():
 
     filter_arr = np.ones(n, dtype=bool)
 
+    logging.info(lh_limit)
     logging.info(rh_limit)
 
     for i in xrange(n):
@@ -125,6 +126,7 @@ def main():
         surface_id_out = 0 if id_out <= lh_limit else 1
 	id_out = id_out - surface_id_out*lh_limit
 
+        # snap the in point to the closest vertex on the mesh
         # snap the out point to the closest vertex on the mesh
         index_out = snap_to_closest_vertex(surfaces[surface_id_out].GetCell(id_out), pts1[i])
 
