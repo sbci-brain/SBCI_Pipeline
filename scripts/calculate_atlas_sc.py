@@ -16,8 +16,8 @@ def _build_args_parser():
     p = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                 description=DESCRIPTION)
 
-    p.add_argument('--time_series', action='store', metavar='LH_TIME_SERIES', required=True,
-                   type=str, help='Path of the .npz file containing functional time series.')
+    p.add_argument('--intersections', action='store', metavar='INTERSECTIONS', required=True,
+                   type=str, help='Path of the .npz file of intersections that have been snapped to nearest vertices.')
 
     p.add_argument('--mesh', action='store', metavar='MESH', required=True,
                    type=str, help='Path to the mapping for the resolution of the surfaces (.npz).')
@@ -31,21 +31,13 @@ def _build_args_parser():
     p.add_argument('--mask_indices', type=int, nargs='+', default=[-1],
                    help='List of freesurfer label indices to ignore when calculating connectivity.')
 
+    p.add_argument('--count', action='store_true', dest='count',
+                   help='If set, SC is calculated as total count instead of mean count.')
+
     p.add_argument('-f', action='store_true', dest='overwrite',
                    help='If set, overwrite files if they already exist.')
 
     return p
-
-
-# calculate the 2D (vector) Pearson correlation
-def corr2(X, Y):
-    X_mX = X - X.mean(axis=1).reshape((-1, 1))
-    Y_mY = Y - Y.mean(axis=1).reshape((-1, 1))
-
-    ssX = (X_mX**2).sum(axis=1).reshape((-1, 1))
-    ssY = (Y_mY**2).sum(axis=1).reshape((1, -1))
-
-    return np.dot(X_mX, Y_mY.T) / np.sqrt(np.dot(ssX, ssY))
 
 
 def main():
@@ -54,7 +46,7 @@ def main():
     logging.basicConfig(level=logging.INFO)
 
     # make sure the input files exist
-    if not isfile(args.time_series):
+    if not isfile(args.intersections):
         parser.error('The file "{0}" must exist.'.format(args.time_series))
 
     if not isfile(args.mesh):
@@ -78,54 +70,58 @@ def main():
     # load atlas
     atlas = np.load(args.atlas, allow_pickle=True)
     mask = np.isin(atlas['fs_labels'], args.mask_indices, invert=True)
-    grouping = atlas['sbci_labels']
 
-    rois = np.unique(grouping[mask])
-    n = len(rois)
+    # load intersections that have already been snapped to nearest vertices of full mesh
+    intersections = np.load(args.intersections, allow_pickle=True)
 
-    logging.info('Loading timeseries data.')
+    id_in = intersections['v_ids0'].astype(np.int)
+    id_out = intersections['v_ids1'].astype(np.int)
+    surf_in = intersections['surf_ids0']
+    surf_out = intersections['surf_ids1']
 
-    # load time series for left and right hemispheres
-    time_series_data = np.load(args.time_series)
-    time_series_data = np.concatenate((time_series_data['lh_time_series'], time_series_data['rh_time_series']))
+    # only keep the white matter surfaces from the intersections 
+    # file and map rh vertex ids to the full brain indices
+    id_in[surf_in == 1] = id_in[surf_in == 1] + shape[4]
+    id_out[surf_out == 1] = id_out[surf_out == 1] + shape[4]
 
-    logging.info('TS length:' + str(time_series_data.shape))
-    logging.info('Calculating mean signal for ' + str(shape[0]) + ' vertices.')
+    id_in = id_in[(surf_in <= 1) & (surf_out <= 1)]
+    id_out = id_out[(surf_in <= 1) & (surf_out <= 1)]
 
     # initialise an array to fill in the loop
-    mean_time_series = np.empty([shape[0], time_series_data.shape[1]], dtype=np.float64)
+    result = np.zeros([shape[0], shape[0]], dtype=np.float64)
 
-    # calculate mean signal at each 
-    # vertice given the current mapping
+    logging.info('Calculating SC for ' + str(len(id_in)) + ' streamlines.')
+
+    id_in_buf = id_in.copy()
+    id_out_buf = id_out.copy()
+
+    # map intersections to the given resolution
     for i in range(shape[0]):
-        vertex = mapping[i]
-        mean_time_series[i, :] = np.mean(time_series_data[vertex, :], axis=0)
+        id_in[np.in1d(id_in_buf, mapping[i])] = i
+        id_out[np.in1d(id_out_buf, mapping[i])] = i
 
-    n = len(rois)
+    # calculate the structural connectivity
+    for i in range(len(id_in)):
+        result[id_in[i], id_out[i]] += 1
+      
+        # only count self connections once
+        if not id_in[i] == id_out[i]:
+            result[id_out[i], id_in[i]] += 1
 
-    # initialise an array to fill in the loop
-    result = np.zeros([n, n], dtype=np.float64)
-
-    logging.info('Calculating FC.')
-
-    # calculate fc a each given roi in the current mapping
-    for i in range(n):
-        mask = (grouping == rois[i])
-        roi_a = mean_time_series[mask, :]
-
-        for j in range(i, n):
+    # get the mean connectivity
+    for i in range(shape[0]):
+        for j in range(i, shape[0]):
             if i == j:
                 result[i, j] = 0
                 continue
 
-            mask = (grouping == rois[j])
-            roi_b = mean_time_series[mask, :]
+    result = result[mask,:]
+    result = result[:,mask]
 
-            result[i, j] = corr2(roi_a, roi_b)
+    logging.info(result.shape)
 
     # save the results
-    scio.savemat(args.output, {'fc': result})
-    #np.savez_compressed(args.output, fc=result)
+    scio.savemat(args.output, {'sc': result})
 
 
 if __name__ == "__main__":
