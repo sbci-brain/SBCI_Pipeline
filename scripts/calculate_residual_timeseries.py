@@ -3,7 +3,7 @@ import logging
 import nibabel as nib
 import numpy as np
 
-from os.path import isfile
+from os.path import isfile, splitext
 
 DESCRIPTION = """
   Regress out the given confounders from the timeseries data.

@@ -2,7 +2,6 @@ import argparse
 import logging
 import nibabel as nib
 import numpy as np
-
 import scipy.io as scio
 
 from os.path import isfile
@@ -16,8 +15,11 @@ def _build_args_parser():
     p = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                 description=DESCRIPTION)
 
-    p.add_argument('--time_series', action='store', metavar='LH_TIME_SERIES', required=True,
+    p.add_argument('--time_series', action='store', metavar='TIME_SERIES', required=True,
                    type=str, help='Path of the .npz file containing functional time series.')
+
+    p.add_argument('--sub_rois', nargs='+', metavar='SUB_ROIS', default=None,
+                   type=int, help='Labels of the subcortical ROIs to calculate the FC for.')
 
     p.add_argument('--mesh', action='store', metavar='MESH', required=True,
                    type=str, help='Path to the mapping for the resolution of the surfacecs (.npz).')
@@ -70,8 +72,9 @@ def main():
     logging.info('Loading timeseries data.')
 
     # load time series for left and right hemispheres
-    time_series_data = np.load(args.time_series)
-    time_series_data = np.concatenate((time_series_data['lh_time_series'], time_series_data['rh_time_series']))
+    full_time_series_data = np.load(args.time_series)
+    time_series_data = np.concatenate((full_time_series_data['lh_time_series'], 
+                                       full_time_series_data['rh_time_series']))
 
     logging.info('TS length:' + str(time_series_data.shape))
     logging.info('Calculating mean signal for ' + str(shape[0]) + ' vertices.')
@@ -90,7 +93,6 @@ def main():
     n = shape[0]
     fc = np.ones(((n * (n+1)) / 2))
     index = 0
-    next_index = 0
 
     # calculate the FC using an upper triangular indexing scheme
     for i in xrange(n-1):
@@ -106,8 +108,60 @@ def main():
     result = np.zeros((n,n))
     result[np.triu_indices(n)] = fc
 
+    # replace all nans with 0s
+    result = np.nan_to_num(result)
+
+    sub_sub_fc = None
+    sub_surf_fc = None
+
+    # calculate subcortical FC
+    if not args.sub_rois is None:
+        logging.info('Calculating FC for subcortical regions.')
+         
+        labels = ['label_' + lbl for lbl in map(str, args.sub_rois)]
+        print(labels)
+        n = len(labels)
+
+        sub_mean_time_series = np.empty([n, time_series_data.shape[1]], dtype=np.float64)
+        
+        for i in range(n):
+            sub_mean_time_series[i,:] = np.mean(full_time_series_data[labels[i]], axis=0)
+   
+        fc = np.ones(((n * (n+1)) / 2))
+        index = 0
+
+        # calculate the subcortico-subcortical FC using an upper triangular indexing scheme
+        for i in xrange(n-1):
+            index += 1
+            offset = n - i
+
+            fc[index:(index+offset-1)] = corr2(sub_mean_time_series[i:(i+1), :], 
+                                               sub_mean_time_series[(i+1):, :]).ravel()
+
+            # used for upper triangular indices
+            index += offset-1
+
+        sub_sub_fc = np.zeros((n,n))
+        sub_sub_fc[np.triu_indices(n)] = fc
+
+        # replace all nans with 0s
+        sub_sub_fc = np.nan_to_num(sub_sub_fc)
+
+        # calculate the cortico-subcortical FC
+        sub_surf_fc = np.ones((n, shape[0]))
+
+        # calculate the subcortico-subcortical FC using an upper triangular indexing scheme
+        for i in range(n):
+            sub_surf_fc[i,:] = corr2(sub_mean_time_series[i:(i+1), :], mean_time_series).ravel()
+
+        # replace all nans with 0s
+        sub_surf_fc = np.nan_to_num(sub_surf_fc)
+
     # save the results
-    scio.savemat(args.output, {'fc': result})
+    scio.savemat(args.output, {'fc': result, 
+                               'sub_sub_fc': sub_sub_fc, 
+                               'sub_surf_fc': sub_surf_fc})
+
     #np.savez_compressed(args.output, time_series=mean_time_series, fc=fc)
 
 
