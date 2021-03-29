@@ -18,6 +18,9 @@ def _build_args_parser():
     p.add_argument('--input', action='store', metavar='INPUT', required=True,
                    type=str, help='Path of the file containing kernel data.')
 
+    p.add_argument('--intersections', action='store', metavar='INTERSECTIONS', required=True,
+                   type=str, help='Path of the .npz file of intersections that have been snapped to nearest vertices.')
+
     p.add_argument('--mesh', action='store', metavar='MESH', required=True,
                    type=str, help='Path to the mapping for the resolution of the surfacecs (.npz).')
 
@@ -38,6 +41,9 @@ def main():
     # make sure the input files exist
     if not isfile(args.input):
         parser.error('The file "{0}" must exist.'.format(args.input))
+
+    if not isfile(args.intersections):
+        parser.error('The file "{0}" must exist.'.format(args.intersections))
 
     if not isfile(args.mesh):
         parser.error('The file "{0}" must exist.'.format(args.mesh))
@@ -83,9 +89,14 @@ def main():
     kernel[shape[1]:,0:shape[1]] = D
     kernel[0:shape[1],shape[1]:] = C
 
+    # normalise the matrix to make a probability distribution
+    intersections = np.load(args.intersections, allow_pickle=True)
+    N = len(intersections['v_ids0'].astype(np.int64))
+    kernel = kernel / N
+
     # save the results
-    #scio.savemat(args.output, {'sc': np.triu(kernel}))
-    scio.savemat(args.output + '.mat', {'sc': kernel})
+    #scio.savemat(args.output + '.mat', {'sc': kernel})
+    scio.savemat(args.output, {'sc': np.triu(kernel)})
     sparse.save_npz(args.output + '.npz', sparse.csr_matrix(kernel))
 
 if __name__ == "__main__":

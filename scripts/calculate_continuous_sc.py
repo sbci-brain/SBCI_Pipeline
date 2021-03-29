@@ -124,7 +124,7 @@ def main():
     # save results
     #np.save(args.output, sc_matrix)
     #np.savez_compressed(args.output, sc=sc_matrix)
-    scio.savemat(args.output, {'sc': sc_matrix})
+    scio.savemat(args.output, {'csc': sc_matrix})
 
 
 if __name__ == "__main__":

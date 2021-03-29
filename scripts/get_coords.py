@@ -5,7 +5,7 @@ import vtk
 import scipy.io as scio
 import numpy as np
 
-from os.path import isfile
+from os.path import isfile, splitext
 
 DESCRIPTION = """
   Extract points from a .vtk surface and output as a .mat file.
@@ -76,7 +76,10 @@ def main():
         result[i, 2:5] = points[hemisphere].GetPoint(i - (lh_n * hemisphere))
 
     # save the results
-    scio.savemat(args.output, {'coords': result})
+    if splitext(args.output)[1] == '.npz':
+        np.savez_compressed(args.output, coords=result)
+    else:
+        scio.savemat(args.output, {'coords': result})
 
 if __name__ == "__main__":
     main()

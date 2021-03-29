@@ -2,6 +2,7 @@ import argparse
 import logging
 import nibabel as nib
 import numpy as np
+import scipy.io as scio
 
 from os.path import isfile
 
@@ -93,8 +94,11 @@ def main():
 
             result[i, j] = np.tanh(np.mean(np.arctanh(clipped_cor)))
 
+    # remove all NaNs and set to 0
+    result = np.nan_to_num(result)
+
     # save the results
-    np.savez_compressed(args.output, fc=result)
+    scio.savemat(args.output, {'cfc': result})
 
 
 if __name__ == "__main__":

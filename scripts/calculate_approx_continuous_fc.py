@@ -2,7 +2,6 @@ import argparse
 import logging
 import nibabel as nib
 import numpy as np
-
 import scipy.io as scio
 
 from os.path import isfile
@@ -129,8 +128,11 @@ def main():
             fisher_corr = np.nansum(fisher_corr * area_ab) / (sum(area_a) * sum(area_b))
             result[i, j] = np.tanh(fisher_corr)
 
+    # replace all nans with 0s
+    result = np.nan_to_num(result)
+
     # save the results
-    scio.savemat(args.output, {'fc': result})
+    scio.savemat(args.output, {'cfc': result})
     #np.savez_compressed(args.output, fc=result)
 
 

@@ -1,7 +1,9 @@
 import argparse
 import logging
-import numpy as np
 import vtk
+
+import numpy as np
+import scipy.io as scio
 
 from scipy import sparse
 from os.path import isfile
@@ -112,7 +114,7 @@ def main():
             sc_matrix[j, i] = sc_matrix[i, j]
 
     # save results
-    sparse.save_npz(args.output, sc_matrix.tocsr())
+    scio.savemat(args.output, {'sc': sc_matrix})
 
 
 if __name__ == "__main__":
