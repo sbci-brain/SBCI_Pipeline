@@ -119,7 +119,6 @@ def main():
         logging.info('Calculating FC for subcortical regions.')
          
         labels = ['label_' + lbl for lbl in map(str, args.sub_rois)]
-        print(labels)
         n = len(labels)
 
         sub_mean_time_series = np.empty([n, time_series_data.shape[1]], dtype=np.float64)
