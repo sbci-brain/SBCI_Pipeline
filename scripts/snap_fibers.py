@@ -132,8 +132,6 @@ def main():
         mask = (surface_map == surf_id)
         tri_mask = np.any(mask[triangles], axis=1)
         surf_ids[tri_mask] = surf_id
-        print(surf_id)
-        print(np.sum(tri_mask))
 
     # load the intersections file
     intersections = np.load(args.intersections, allow_pickle=True)
