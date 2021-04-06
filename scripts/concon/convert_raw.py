@@ -89,10 +89,10 @@ def main():
     kernel[shape[1]:,0:shape[1]] = D
     kernel[0:shape[1],shape[1]:] = C
 
-    # normalise the matrix to make a probability distribution
-    intersections = np.load(args.intersections, allow_pickle=True)
-    N = len(intersections['v_ids0'].astype(np.int64))
-    kernel = kernel / N
+    ## normalise the matrix to make a probability distribution
+    #intersections = np.load(args.intersections, allow_pickle=True)
+    #N = len(intersections['v_ids0'].astype(np.int64))
+    #kernel = kernel / N
 
     # save the results
     #scio.savemat(args.output + '.mat', {'sc': kernel})

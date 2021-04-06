@@ -78,6 +78,10 @@ def main():
     id_in[surf_in == 1] = id_in[surf_in == 1] + shape[4]
     id_out[surf_out == 1] = id_out[surf_out == 1] + shape[4]
 
+    mask = (surf_in < 2) & (surf_out < 2)
+    id_in = id_in[mask]
+    id_out = id_out[mask]
+
     logging.info('Calculating SC for ' + str(len(id_in)) + ' streamlines.')
 
     id_in_buf = id_in.copy()

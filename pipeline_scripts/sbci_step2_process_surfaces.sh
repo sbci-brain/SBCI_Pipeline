@@ -41,6 +41,8 @@ python ${SCRIPT_PATH}/normalise_vtk.py \
        --surface ${OUTPUTDIR}/rh_sphere_reg_lps.vtk \
        --output ${OUTPUTDIR}/rh_sphere_reg_lps_norm.vtk -f
 
+python ${SCRIPT_PATH}/get_coords.py --lh_surface ${OUTPUTDIR}/lh_sphere_reg_lps_norm.vtk --rh_surface ${OUTPUTDIR}/rh_sphere_reg_lps_norm.vtk --output ${OUTPUTDIR}/subject_coords.npz -f
+
 # Step1) Sample from the white matter mesh to the required resolution
 python ${SCRIPT_PATH}/sample_surface.py \
        --surface ${OUTPUTDIR}/lh_white_lps.vtk \

@@ -90,6 +90,9 @@ python ${SCRIPT_PATH}/normalise_vtk.py \
 rm ${AVGDIR}/tmp_lh_grid.m
 rm ${AVGDIR}/tmp_rh_grid.m
 
+# Step5) Generate coordinates file for grid
+python ${SCRIPT_PATH}/get_coords.py --lh_surface ${AVGDIR}/lh_grid_avg_${RESOLUTION}.vtk --rh_surface ${AVGDIR}/rh_grid_avg_${RESOLUTION}.vtk --output ${AVGDIR}/grid_coords.npz -f
+
 #######################################
 # LOOP THROUGH SELECTED PARCELLATIONS #
 #######################################
@@ -98,7 +101,7 @@ for PARCELLATION in ${GROUP_PARCELLATIONS[*]}; do
 
   echo Processing Parcellation: ${PARCELLATION}
       
-  # Step5) Calculate atlas' for the downsampled mesh
+  # Step6) Calculate atlas' for the downsampled mesh
   python ${SCRIPT_PATH}/group_roi_vertices.py \
          --lh_annot ${REFDIR}/label/lh.${PARCELLATION}.annot \
          --rh_annot ${REFDIR}/label/rh.${PARCELLATION}.annot \
@@ -106,13 +109,13 @@ for PARCELLATION in ${GROUP_PARCELLATIONS[*]}; do
          --output ${AVGDIR}/${PARCELLATION}_avg_roi_${RESOLUTION}.npz \
          --matlab ${AVGDIR}/${PARCELLATION}_avg_roi_${RESOLUTION}.mat -f
   
-  # Step6) Calculate mapping for the atlas of choice
+  # Step7) Calculate mapping for the atlas of choice
   python ${SCRIPT_PATH}/calculate_roi_mapping.py \
          --lh_annot ${REFDIR}/label/lh.${PARCELLATION}.annot \
          --rh_annot ${REFDIR}/label/rh.${PARCELLATION}.annot \
          --output ${AVGDIR}/mapping_avg_${PARCELLATION}.npz -f
   
-  # Step7) Calculate ordering for the downsampled mesh
+  # Step8) Calculate ordering for the downsampled mesh
   python ${SCRIPT_PATH}/group_roi_vertices.py \
          --lh_annot ${REFDIR}/label/lh.${PARCELLATION}.annot \
          --rh_annot ${REFDIR}/label/rh.${PARCELLATION}.annot \

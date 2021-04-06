@@ -56,7 +56,7 @@ def main():
            if data.has_key(key) == False:
                data[key] = ts_std 
            else:
-               data[key] = np.concatenate([data[key], ts_std]) 
+               data[key] = np.concatenate((data[key], ts_std), axis=1) 
            
     # save the results
     kwargs = {key: data[key] for key in data.keys()}
