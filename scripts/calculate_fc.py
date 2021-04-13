@@ -157,11 +157,12 @@ def main():
         sub_surf_fc = np.nan_to_num(sub_surf_fc)
 
     # save the results
-    scio.savemat(args.output, {'fc': result, 
-                               'sub_sub_fc': sub_sub_fc, 
-                               'sub_surf_fc': sub_surf_fc})
-
-    #np.savez_compressed(args.output, time_series=mean_time_series, fc=fc)
+    if not args.sub_rois is None:
+        scio.savemat(args.output, {'fc': result, 
+                                   'sub_sub_fc': sub_sub_fc, 
+                                   'sub_surf_fc': sub_surf_fc})
+    else:
+        scio.savemat(args.output, {'fc': result})
 
 
 if __name__ == "__main__":
