@@ -50,6 +50,7 @@ python ${SCRIPT_PATH}/map_surfaces.py \
        --lh_surface_lo ${AVGDIR}/lh_sphere_avg_${RESOLUTION}.vtk \
        --rh_surface_hi ${AVGDIR}/rh_sphere_avg_lps.vtk \
        --rh_surface_lo ${AVGDIR}/rh_sphere_avg_${RESOLUTION}.vtk \
+       --matlab_output ${AVGDIR}/mapping_avg_${RESOLUTION}.mat \
        --output ${AVGDIR}/mapping_avg_${RESOLUTION}.npz -f
 
 # Step4) Generate meshes for visualisation
@@ -90,8 +91,9 @@ python ${SCRIPT_PATH}/normalise_vtk.py \
 rm ${AVGDIR}/tmp_lh_grid.m
 rm ${AVGDIR}/tmp_rh_grid.m
 
-# Step5) Generate coordinates file for grid
-python ${SCRIPT_PATH}/get_coords.py --lh_surface ${AVGDIR}/lh_grid_avg_${RESOLUTION}.vtk --rh_surface ${AVGDIR}/rh_grid_avg_${RESOLUTION}.vtk --output ${AVGDIR}/grid_coords.npz -f
+# Step5) Generate coordinates and adjacency matrix files for grid
+python ${SCRIPT_PATH}/get_coords.py --lh_surface ${AVGDIR}/lh_grid_avg_${RESOLUTION}.vtk --rh_surface ${AVGDIR}/rh_grid_avg_${RESOLUTION}.vtk --output ${AVGDIR}/grid_coords_${RESOLUTION}.mat -f
+python ${SCRIPT_PATH}/get_adjacency_matrix.py --lh_surface ${AVGDIR}/lh_grid_avg_${RESOLUTION}.vtk --rh_surface ${AVGDIR}/rh_grid_avg_${RESOLUTION}.vtk --output ${AVGDIR}/adjacency_${RESOLUTION}.mat -f
 
 #######################################
 # LOOP THROUGH SELECTED PARCELLATIONS #
