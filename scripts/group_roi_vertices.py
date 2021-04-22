@@ -137,8 +137,8 @@ def main():
                         names=np.concatenate((lh_names, rh_names)),
                         colors=None)
 
-    scio.savemat(args.matlab, {'sorted_idx': new_order,
-                               'labels': np.concatenate((new_lh_labels, new_rh_labels)),
+    scio.savemat(args.matlab, {'sorted_idx': new_order + 1,
+                               'labels': np.concatenate((new_lh_labels, new_rh_labels)) + 1,
                                'names': np.concatenate((lh_names, rh_names))})
 
 
