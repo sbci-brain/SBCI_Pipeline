@@ -1,6 +1,7 @@
 import argparse
 import logging
 import numpy as np
+import scipy.io as scio
 import vtk
 
 from collections import defaultdict, OrderedDict
@@ -29,6 +30,9 @@ def _build_args_parser():
 
     p.add_argument('--output', action='store', metavar='OUTPUT', required=True,
                    type=str, help='Path of the .npz file to save the output to.')
+
+    p.add_argument('--matlab_output', action='store', metavar='MATLAB_OUTPUT', default=None,
+                   type=str, help='Path of the .mat file to save the output to.')
 
     p.add_argument('-f', action='store_true', dest='overwrite',
                    help='If set, overwrite files if they already exist.')
@@ -96,6 +100,13 @@ def main():
         else:
             parser.error('The file "{0}" already exists. Use -f to overwrite it.'.format(args.output))
 
+    # make sure that files are not accidently overwritten
+    if not args.matlab_output is None and isfile(args.matlab_output):
+        if args.overwrite:
+            logging.info('Overwriting "{0}".'.format(args.matlab_output))
+        else:
+            parser.error('The file "{0}" already exists. Use -f to overwrite it.'.format(args.matlab_output))
+
     logging.info('Loading .vtk surfaces, mapping, and intersections.')
 
     # load the low resolution surfaces, the vertices of the high resolution surfaces, and initialise cell locator algorithms
@@ -162,6 +173,13 @@ def main():
     # save the results: mapping contains arrays of vertex numbers from original mesh that have been assigned to each
     # of the vertices of the downsampled mesh; shape has the number of vertices for both high and low resolution meshes.
     np.savez_compressed(args.output, mapping=vertices, shape=shape, lh_ids=leftvertex, rh_ids=rightvertex)
+
+    if not args.matlab_output is None:
+        ids = [[i+1]*len(x) for i,x in enumerate(vertices)] 
+        mapping = np.array([np.concatenate(vertices)+1, np.concatenate(ids)])
+
+        sbci_map = {'map': mapping, 'shape': shape}
+        scio.savemat(args.matlab_output, {'sbci_map': sbci_map})
 
 
 if __name__ == "__main__":
