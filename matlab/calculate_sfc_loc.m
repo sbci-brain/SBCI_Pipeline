@@ -8,7 +8,7 @@
 %   sc - (matrix) A PxP matrix of continuous SC data   
 %   fc - (matrix) A PxP matrix of continuous FC data
 %   min_area - (integer) A threshold for ROI size
-%   parcellation - (matrix) A Px2 matrix with parcellation output from SBCI
+%   sbci_parc - (struct) A struct with parcellation output from SBCI
 %   triangular - (logical) If true, the FC and SC matrices are 
 %       symmeterised before calculating SFC
 %
@@ -20,7 +20,7 @@
 %   symmetric or triangular. and that the parcellation or SC, FC, 
 %   matrices have not been rearranged in any way from SBCI output.
 %
-function [sfc_loc] = calculate_sfc_loc(sc, fc, parcellation, min_area, triangular)
+function [sfc_loc] = calculate_sfc_loc(sc, fc, sbci_parc, min_area, triangular)
     if ~exist('min_area','var')
         min_area = 10;
     end
@@ -49,7 +49,7 @@ function [sfc_loc] = calculate_sfc_loc(sc, fc, parcellation, min_area, triangula
     % remove constant columns
     fc = fc(nanmask, nanmask);
     sc = sc(nanmask, nanmask);
-    labels = parcellation(nanmask,2);
+    labels = sbci_parc.labels(nanmask);
     
     % calculate local SFC
     rois = unique(labels);
