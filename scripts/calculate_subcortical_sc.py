@@ -72,7 +72,7 @@ def main():
             parser.error('The file "{0}" already exists. Use -f to overwrite it.'.format(args.output))
 
     ### TODO: GET NUMBER OF SUBCORTICAL SURFACES PROGRAMATICALLY
-    n = 13
+    n = 19
 
     logging.info('Loading mapping and intersections.')
 
@@ -125,6 +125,8 @@ def main():
     tmp_surf_in = surf_in[subwhite_mask]
     tmp_surf_out = surf_out[subwhite_mask]
 
+    logging.info('Smoothing {0} streamlines.'.format(sum(subwhite_mask)))
+
     # use guassian kde to smooth the sc similar to cortical-cortical SC
     kernel = KernelDensity(bandwidth=args.bandwidth, metric='haversine',
                            kernel='gaussian', algorithm='ball_tree')
@@ -163,15 +165,12 @@ def main():
             kernel.fit(white_coords)
             subwhite_sc[i,lh_points:] = (np.exp(kernel.score_samples(rh_grid)) * white_coords.shape[0]) 
 
-        subwhite_sc[i,:] = subwhite_sc[i,:] / total_size
+        #subwhite_sc[i,:] = subwhite_sc[i,:] / total_size
 
         idx, cnt = np.unique(vtx_ids, return_counts=True)
         surf_data[idx + lh_latlon.shape[0]] = cnt
 
-        np.savez_compressed('counts_' + str(i) + '.vtk', surf_data=surf_data)
-        np.savez_compressed('smooth_' + str(i) + '.vtk', smooth_data=subwhite_sc[:,i])
-
-    subwhite_sc = subwhite_sc / len(id_in)
+    #subwhite_sc = subwhite_sc / len(id_in)
         
     # save results
     scio.savemat(args.output, {'sub_sub_sc': subsub_sc, 

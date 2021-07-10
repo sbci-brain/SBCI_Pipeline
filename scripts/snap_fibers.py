@@ -141,6 +141,8 @@ def main():
     tri_ids1 = intersections['tri_ids1'].astype(int)
     pts0 = intersections['pts0']
     pts1 = intersections['pts1']
+    surf_ids0 = intersections['surf_ids0']
+    surf_ids1 = intersections['surf_ids1']
 
     logging.info('Snapping intersections to nearest vertices.')
 
@@ -157,8 +159,15 @@ def main():
         index_in = index_out = 0
 
         # get the surfaces belonging to the triangles
-        surface_id_in = surf_ids[tri_ids0[i]]
-        surface_id_out = surf_ids[tri_ids1[i]]
+        if surf_ids0[i] == 1:
+            surface_id_in = surf_ids[tri_ids0[i]]
+        else:
+            surface_id_in = surf_ids0[i] 
+
+        if surf_ids1[i] == 1:
+            surface_id_out = surf_ids[tri_ids1[i]]
+        else:
+            surface_id_out = surf_ids1[i] 
         
         if surface_id_in <= 1:
             # snap the in point to the closest vertex on the mesh

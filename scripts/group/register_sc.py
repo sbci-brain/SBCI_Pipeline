@@ -120,25 +120,23 @@ def main():
     logging.info('Registering to nearest vertex.')
 
     for i in xrange(n):
-        if surf_ids0[i] > 1 or surf_ids1[i] > 1:
-            continue
+        if int(surf_ids0[i]) <= 1:
+            surface_id_in = int(surf_ids0[i])
+            id_in = int(v_ids0[i])
 
-        surface_id_in = int(surf_ids0[i])
-        id_in = int(v_ids0[i])
-
-        # find the closest point and triangle of the lower resolution mesh to a given vertex on the full mesh
-        index_in = locators[surface_id_in].FindClosestPoint(points[surface_id_in].GetPoint(id_in))
+            # find the closest point and triangle of the lower resolution mesh to a given vertex on the full mesh
+            index_in = locators[surface_id_in].FindClosestPoint(points[surface_id_in].GetPoint(id_in))
+            v_ids0[i] = index_in
 
         ################################
 
-        surface_id_out = int(surf_ids1[i])
-        id_out = int(v_ids1[i])
+        if int(surf_ids1[i]) <= 1:
+            surface_id_out = int(surf_ids1[i])
+            id_out = int(v_ids1[i])
 
-        # snap the out point to the closest vertex on the mesh
-        index_out = locators[surface_id_out].FindClosestPoint(points[surface_id_out].GetPoint(id_out))
-
-        v_ids0[i] = index_in
-        v_ids1[i] = index_out
+            # snap the out point to the closest vertex on the mesh
+            index_out = locators[surface_id_out].FindClosestPoint(points[surface_id_out].GetPoint(id_out))
+            v_ids1[i] = index_out
 
     # save the results
     np.savez_compressed(args.output,

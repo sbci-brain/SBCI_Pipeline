@@ -39,13 +39,24 @@ scil_surface_pft_dipy.py diffusion/fodf/fodf.nii.gz \
 scil_convert_tractogram.py set/streamline/set_random_loop${RUN}.trk \
         set/streamline/set_random_loop${RUN}.fib -f
 
-# calculate intersections
-scil_surface_tractogram_intersections.py set/out_surf/flow_${STEPS}_1.vtk \
-        set/streamline/set_random_loop${RUN}.fib \
-        set/preprocess/surfaces_type.npy set/out_surf/intersections_mask.npy \
-        --output_intersections set/streamline/intersections_random_loop${RUN}.npz \
-        --output_tractogram set/streamline/set_random_loop${RUN}_cut.fib \
-        --only_endpoints -f
+# calculate interections (SBCI cuts subcortical fibers 
+# into n choose 2 pairs between n intersecting ROIs)
+python ${SCRIPT_PATH}/trim_cortical_fibers.py \
+        --surfaces set/out_surf/flow_${STEPS}_1.vtk \
+        --surface_map set/preprocess/surfaces_type.npy \
+        --surface_mask set/out_surf/intersections_mask.npy \
+        --aparc set/preprocess/aparc.a2009s+aseg.nii.gz \
+        --streamline set/streamline/set_random_loop${RUN}.fib \
+        --out_tracts set/streamline/set_random_loop${RUN}_cut.fib \
+        --output set/intersections_random_loop${RUN}.npz -f
+
+# old method to calculate intersections (SET cuts based on surfaces, not volumes) 
+#scil_surface_tractogram_intersections.py set/out_surf/flow_${STEPS}_1.vtk \
+#        set/streamline/set_random_loop${RUN}.fib \
+#        set/preprocess/surfaces_type.npy set/out_surf/intersections_mask.npy \
+#        --output_intersections set/streamline/intersections_random_loop${RUN}.npz \
+#        --output_tractogram set/streamline/set_random_loop${RUN}_cut.fib \
+#        --only_endpoints -f
 
 # combine intersection with flow
 scil_surface_combine_flow.py set/out_surf/flow_${STEPS}_1.vtk \

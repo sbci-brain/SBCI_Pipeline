@@ -25,6 +25,8 @@ cp ./structure/t1_freesurfer/surf/lh.white set/preprocess/
 cp ./structure/t1_freesurfer/surf/rh.white set/preprocess/
 cp ./structure/t1_freesurfer/mri/wmparc.mgz set/preprocess/
 
+cp ./structure/aparc.a2009s+aseg.nii.gz set/preprocess/
+
 # convert volume 
 # ET suggested to run these command lines (mri_convert) in the freesurfer folder;
 # since mris_convert might need other files to conduct the transformation

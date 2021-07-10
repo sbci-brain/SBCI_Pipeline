@@ -82,3 +82,10 @@ python ${SCRIPT_PATH}/concon/convert_raw.py \
        --mesh ${AVGDIR}/mapping_avg_${RESOLUTION}.npz \
        --output ${OUTPUTDIR}/smoothed_sc_avg_${BANDWIDTH}_${RESOLUTION} -f
 
+# Step4) Calculate subcortical SC matrices
+python ../gitrepo/SBCI/scripts/calculate_subcortical_sc.py \
+       --intersections ${OUTPUTDIR}/snapped_fibers.npz \
+       --grid ${AVGDIR}/grid_coords_${RESOLUTION}.npz \
+       --coordinates ${OUTPUTDIR}/SBCI/subject_coords.npz \
+       --bandwidth 0.05 \
+       --output ${OUTPUTDIR}/SBCI/sub_sc_avg_${RESOLUTION}.mat -f
