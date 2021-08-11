@@ -71,9 +71,6 @@ def main():
         else:
             parser.error('The file "{0}" already exists. Use -f to overwrite it.'.format(args.output))
 
-    ### TODO: GET NUMBER OF SUBCORTICAL SURFACES PROGRAMATICALLY
-    n = 19
-
     logging.info('Loading mapping and intersections.')
 
     # load coordinates and convert from cartesian to lattitude,longitude
@@ -102,6 +99,13 @@ def main():
     logging.info('Calculating SC for subcortical-subcortical streamlines.')
 
     # subcortical to subcortical
+    print(np.unique(surf_in))
+    rois = np.concatenate([np.unique(surf_in), np.unique(surf_out)])
+    rois = np.unique(rois[rois >= 2])
+
+    logging.info('ROIs: {0}'.format(rois))
+
+    n = len(rois)
     subsub_mask = in_mask & out_mask
     subsub_sc = np.zeros([n,n])
 

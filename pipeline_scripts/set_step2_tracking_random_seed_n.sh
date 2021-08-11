@@ -46,9 +46,10 @@ python ${SCRIPT_PATH}/trim_cortical_fibers.py \
         --surface_map set/preprocess/surfaces_type.npy \
         --surface_mask set/out_surf/intersections_mask.npy \
         --aparc set/preprocess/aparc.a2009s+aseg.nii.gz \
+        --rois ${ROIS[*]} \
         --streamline set/streamline/set_random_loop${RUN}.fib \
         --out_tracts set/streamline/set_random_loop${RUN}_cut.fib \
-        --output set/intersections_random_loop${RUN}.npz -f
+        --output set/streamline/intersections_random_loop${RUN}.npz -f
 
 # old method to calculate intersections (SET cuts based on surfaces, not volumes) 
 #scil_surface_tractogram_intersections.py set/out_surf/flow_${STEPS}_1.vtk \
@@ -61,7 +62,7 @@ python ${SCRIPT_PATH}/trim_cortical_fibers.py \
 # combine intersection with flow
 scil_surface_combine_flow.py set/out_surf/flow_${STEPS}_1.vtk \
 		set/out_surf/flow_${STEPS}_1.hdf5 \
-         	set/streamline/intersections_random_loop${RUN}.npz \
+        	set/streamline/intersections_random_loop${RUN}.npz \
               	set/streamline/set_random_loop${RUN}_cut.fib \
         	set/streamline/set_random_loop${RUN}.fib \
                 --compression_rate 0.2

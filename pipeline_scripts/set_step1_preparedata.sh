@@ -86,10 +86,10 @@ for ROI in ${ROIS[*]}; do
 		--vts_val 1.0 \
 		--save_vts_mask set/preprocess/${NAME}_intersections_mask.npy -f
   
-  # at each vertices check fa value and binarise 0 if < 0.5, 1 otherwise
+  # at each vertices check fa value and binarise 0 if < 0.01, 1 otherwise
   scil_surface_map_from_volume.py set/preprocess/roi_${NAME}.vtk \
 		diffusion/dti/fa.nii.gz set/preprocess/${NAME}_seed_mask.npy \
-		--binarize --binarize_value 0.5 -f
+		--binarize --binarize_value 0.01 -f
 
   ROI_SURFACES="$ROI_SURFACES set/preprocess/roi_${NAME}.vtk"
   ROI_FLOW_MASKS="$ROI_FLOW_MASKS set/preprocess/${NAME}_flow_mask.npy"

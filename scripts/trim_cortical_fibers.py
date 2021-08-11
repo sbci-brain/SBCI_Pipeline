@@ -24,9 +24,6 @@ DEPTH_THR = 2
 SAMPLE_SIZE = 0.2
 COMPRESSION_RATE = 0.2
 
-# TODO: make possible to have user define which subcortical ROIs to calculate
-SUB_CORTICAL_LABELS = [4,8,10,11,12,13,17,18,26,43,47,49,50,51,52,53,54,58,16]
-
 # somewhere to store generated streamlines and their intersections
 class ROI_Streamlines(
     namedtuple('ROI_Streamlines', ['streamlines', 
@@ -91,6 +88,9 @@ def _build_args_parser():
 
     p.add_argument('--aparc', action='store', metavar='APARC', required=True,
                    type=str, help='Path of the parcellation image used for subcortical volumes.')
+
+    p.add_argument('--rois', type=int, nargs='+', required=True,
+                   help='List of roi indices to include.')
 
     p.add_argument('--streamlines', action='store', metavar='STREAMLINES', required=True,
                    type=str, help='Path of the .fib file of tractography from SET.')
@@ -210,7 +210,7 @@ def trim_cortical_streamline(streamline, sl_id, locator, surface_mask, surface_t
 
 
 # split streamlines into #ROIs choose 2 fibers and filter out non-intersecting tracts 
-def split_subcortical_streamline(streamline, label_data, tri_in, tri_out):
+def split_subcortical_streamline(streamline, label_data, rois, tri_in, tri_out):
     # somewhere to put results
     new_streamlines = []
     ids_in = []
@@ -221,7 +221,7 @@ def split_subcortical_streamline(streamline, label_data, tri_in, tri_out):
     surf_out = []
 
     # check if the streamline passes through any subcortical regions
-    n_subcortical = np.sum(np.isin(SUB_CORTICAL_LABELS, np.unique(label_data)))
+    n_subcortical = np.sum(np.isin(rois, np.unique(label_data)))
 
     # check if the streamline intersects with the cortical surface
     n_cortical = np.count_nonzero([tri_in, tri_out])
@@ -246,11 +246,11 @@ def split_subcortical_streamline(streamline, label_data, tri_in, tri_out):
 
     # split the streamline based on intersections with subcortical regions
     for roi in roi_count:
-        if np.isin(roi, SUB_CORTICAL_LABELS) and roi_count[roi] > DEPTH_THR:
+        if np.isin(roi, rois) and roi_count[roi] > DEPTH_THR:
             intersection.append(roi)
 
     # create a library of ROIs for ordering the final SC matrix
-    roi_map = { SUB_CORTICAL_LABELS[i] : i + 2 for i in range(0, len(SUB_CORTICAL_LABELS)) }
+    roi_map = { rois[i] : i + 2 for i in range(0, len(rois)) }
     roi_map[0] = 1
     roi_map[-1] = 1
 
@@ -456,6 +456,7 @@ def main():
     offset = affine[:3, 3] + 0.5
 
     logging.info('Trimming, splitting, and filtering {0} streamlines.'.format(len(streamlines)))
+    print(args.rois)
 
     new_streamlines = ROI_Streamlines([],[],[],[],[],[],[])
 
@@ -491,7 +492,7 @@ def main():
             sl_labels = label_data[ii, jj, kk]
 
             # split fibers among intersecting regions and return all intersections
-            split_streamlines = split_subcortical_streamline(resampled_streamline, sl_labels, tri_in[j], tri_out[j])
+            split_streamlines = split_subcortical_streamline(resampled_streamline, sl_labels, args.rois, tri_in[j], tri_out[j])
 
             # fill the results arrays
             new_streamlines.extend(split_streamlines)

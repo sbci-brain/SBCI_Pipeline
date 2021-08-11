@@ -58,10 +58,11 @@ scil_crop_volume.py diffusion/b0_bet_mask.nii.gz diffusion/b0_mask_cropped.nii.g
         --input_bbox diffusion/dwi_boundingBox.pkl -f
 
 # dwi normalization
-dwinormalise diffusion/dwi_cropped.nii.gz \
-	diffusion/b0_cropped.nii.gz \
-	diffusion/dwi_normalized.nii.gz \
-	-fslgrad diffusion/flip_x.bvec diffusion/flip_x.bval
+dwinormalise individual \
+        diffusion/dwi_cropped.nii.gz \
+        diffusion/b0_cropped.nii.gz \
+        diffusion/dwi_normalized.nii.gz \
+        -fslgrad diffusion/flip_x.bvec diffusion/flip_x.bval -force
 
 # resample the dti image into 1x1x1
 scil_resample_volume.py diffusion/dwi_normalized.nii.gz \
