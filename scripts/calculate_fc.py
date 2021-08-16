@@ -18,9 +18,6 @@ def _build_args_parser():
     p.add_argument('--time_series', action='store', metavar='TIME_SERIES', required=True,
                    type=str, help='Path of the .npz file containing functional time series.')
 
-    p.add_argument('--sub_rois', nargs='+', metavar='SUB_ROIS', default=None,
-                   type=int, help='Labels of the subcortical ROIs to calculate the FC for.')
-
     p.add_argument('--mesh', action='store', metavar='MESH', required=True,
                    type=str, help='Path to the mapping for the resolution of the surfacecs (.npz).')
 
@@ -114,13 +111,13 @@ def main():
     sub_sub_fc = None
     sub_surf_fc = None
 
+    labels = full_time_series_data['subcortical_labels']
+
     # calculate subcortical FC
-    if not args.sub_rois is None:
+    if not labels is None:
         logging.info('Calculating FC for subcortical regions.')
          
-        labels = ['label_' + lbl for lbl in map(str, args.sub_rois)]
         n = len(labels)
-
         sub_mean_time_series = np.empty([n, time_series_data.shape[1]], dtype=np.float64)
         
         for i in range(n):
@@ -151,13 +148,13 @@ def main():
 
         # calculate the subcortico-subcortical FC using an upper triangular indexing scheme
         for i in range(n):
-            sub_surf_fc[i,:] = corr2(sub_mean_time_series[i:(i+1), :], mean_time_series).ravel()
+            sub_surf_fc[i,j] = corr2(sub_mean_time_series[i:(i+1), :], mean_time_series).ravel()
 
         # replace all nans with 0s
         sub_surf_fc = np.nan_to_num(sub_surf_fc)
 
     # save the results
-    if not args.sub_rois is None:
+    if not labels is None:
         scio.savemat(args.output, {'fc': result, 
                                    'sub_sub_fc': sub_sub_fc, 
                                    'sub_surf_fc': sub_surf_fc})

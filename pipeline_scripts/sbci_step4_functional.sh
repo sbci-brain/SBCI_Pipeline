@@ -22,6 +22,9 @@ while IFS= read -r -d '' FCDIR; do
   python ${SCRIPT_PATH}/calculate_residual_timeseries.py \
          --lh_time_series ${FCDIR}/fmcpr.sm5.fsaverage.lh.nii.gz \
          --rh_time_series ${FCDIR}/fmcpr.sm5.fsaverage.rh.nii.gz \
+         --sub_time_series ${FCDIR}/fmcpr.sm5.mni305.2mm.nii.gz \
+         --aparc ${REFDIR}/mri.2mm/aseg.mgz \
+         --sub_rois ${ROIS[*]} \
          --motion ${FCDIR}/fmcpr.mcdat \
          --wm ${FCDIR}/wm.dat \
          --vcsf ${FCDIR}/vcsf.dat \

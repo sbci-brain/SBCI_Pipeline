@@ -20,6 +20,15 @@ def _build_args_parser():
     p.add_argument('--rh_time_series', action='store', metavar='RH_TIME_SERIES', required=True,
                    type=str, help='Path of the file containing functional time series for the right hemisphere.')
 
+    p.add_argument('--sub_time_series', action='store', metavar='SUB_TIME_SERIES', required=False, default=None,
+                   type=str, help='Path of the file containing functional time series for the right hemisphere.')
+
+    p.add_argument('--aparc', action='store', metavar='APARC', required=False, default='',
+                   type=str, help='Path of the parcellation image used for subcortical volumes.')
+
+    p.add_argument('--sub_rois', nargs='+', metavar='SUB_ROIS', required=False, default=None,
+                   type=int, help='Labels of the subcortical ROIs to calculate the FC for.')
+
     p.add_argument('--motion', action='store', metavar='MOTION', required=False, default='',
                    type=str, help='Path to the motion nuisance regressor file.')
 
@@ -31,6 +40,9 @@ def _build_args_parser():
 
     p.add_argument('--gsl', action='store', metavar='GSL', required=False, default='',
                    type=str, help='Path to the motion nuisance regressor file.')
+
+    p.add_argument('--detrend', action='store', metavar='DETREND', required=False, default=2,
+                   type=int, help='Order of polynomial to use in detrending the time series')
 
     p.add_argument('--output', action='store', metavar='OUTPUT', required=True,
                    type=str, help='Path of the .npz file to save the output to.')
@@ -45,6 +57,17 @@ def main():
     parser = _build_args_parser()
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)
+
+    has_subcortical = (args.aparc != '') & (args.sub_time_series != None) & (args.sub_rois != None)
+
+    if (has_subcortical == False) and (args.aparc != ''):
+        parser.error('Must have atlas, ROI list, and time series for subcortical signal')
+
+    if (has_subcortical == False) and (args.sub_time_series != None):
+        parser.error('Must have atlas, ROI list, and time series for subcortical signal')
+
+    if (has_subcortical == False) and (args.sub_rois != None):
+        parser.error('Must have atlas, ROI list, and time series for subcortical signal')
 
     # make sure the input files exist
     if not isfile(args.lh_time_series):
@@ -72,6 +95,12 @@ def main():
         else:
             parser.error('The file "{0}" already exists. Use -f to overwrite it.'.format(args.output))
 
+    if args.detrend < 0:
+        parser.error('Order of polynomial must be non-nengative, or 0 for no detrending of the time series.')
+
+    if args.detrend > 5:
+        parser.error('Order of polynomial is too large.')
+
     # load time series for left and right hemispheres
     time_series_lh = nib.load(args.lh_time_series)
     time_series_data_lh = time_series_lh.get_data()
@@ -98,11 +127,18 @@ def main():
     if not args.gsl == '':
         confounders = np.concatenate([confounders, np.genfromtxt(args.gsl).reshape([1, n])])
 
+    # add time polynomial terms to detrend the timeseries
+    if not args.detrend == 0:
+        time = np.full((1,n), range(n))
+        confounders = np.concatenate([confounders, np.vstack([time**i for i in range(1, args.detrend+1)])]) 
+
     confounders = confounders.T
 
     XTX_inverse = np.linalg.inv(np.dot(confounders.T, confounders))
     P = np.dot(np.dot(confounders, XTX_inverse), confounders.T) 
     I = np.eye(confounders.shape[0])
+
+    time_series = dict()
 
     lh_residuals = np.zeros(time_series_data_lh.shape)
     rh_residuals = np.zeros(time_series_data_rh.shape)
@@ -110,15 +146,40 @@ def main():
     logging.info('Calculating timeseries for left hemisphere')   
 
     for i in range(time_series_lh.shape[0]):
-	lh_residuals[i, :] = np.dot(I, time_series_data_lh[i, :]) - np.dot(P, time_series_data_lh[i, :])
+	lh_residuals[i, :] = time_series_data_lh[i, :] - np.dot(P, time_series_data_lh[i, :])
 
     logging.info('Calculating timeseries for right hemisphere')   
 
     for i in range(time_series_rh.shape[0]):
-	rh_residuals[i, :] = np.dot(I, time_series_data_rh[i, :]) - np.dot(P, time_series_data_rh[i, :])
+	rh_residuals[i, :] = time_series_data_rh[i, :] - np.dot(P, time_series_data_rh[i, :])
+
+    logging.info('Calculating timeseries for subcortical regions')   
+ 
+    # load time series for subcortical regions
+    if has_subcortical == True:
+        ts_data = nib.load(args.sub_time_series)
+        ts_data = ts_data.get_data()
+
+        # load label images
+        label_img = nib.load(args.aparc)
+        label_data = label_img.get_data().astype('int')
+
+        for roi in args.sub_rois:
+            xyz = np.nonzero(label_data == roi)
+
+            label_name = 'label_' + str(roi)
+            time_series[label_name] = ts_data[xyz]
+
+            for i in range(time_series[label_name].shape[0]):
+  	        time_series[label_name][i, :] = time_series[label_name][i, :] - np.dot(P, time_series[label_name][i, :])
 
     # save the results
-    np.savez_compressed(args.output, lh_time_series=lh_residuals, rh_time_series=rh_residuals)
+    time_series['lh_time_series'] = lh_residuals
+    time_series['rh_time_series'] = rh_residuals
+    time_series['subcortical_labels'] = ['label_' + lbl for lbl in map(str, args.sub_rois)]
+
+    kwargs = {key: time_series[key] for key in time_series.keys()}
+    np.savez_compressed(args.output, **kwargs)
 
 
 if __name__ == "__main__":
