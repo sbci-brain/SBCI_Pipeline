@@ -148,7 +148,7 @@ def main():
 
         # calculate the subcortico-subcortical FC using an upper triangular indexing scheme
         for i in range(n):
-            sub_surf_fc[i,j] = corr2(sub_mean_time_series[i:(i+1), :], mean_time_series).ravel()
+            sub_surf_fc[i,:] = corr2(sub_mean_time_series[i:(i+1), :], mean_time_series[:,:]).ravel()
 
         # replace all nans with 0s
         sub_surf_fc = np.nan_to_num(sub_surf_fc)
