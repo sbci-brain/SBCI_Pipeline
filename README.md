@@ -8,6 +8,8 @@ What you will need:
 2. Multi-shell dwi data
 3. Resting-state fMRI data
 
+The data are assumed to be minimaly preprocessed using FSL's pipeline - i.e., eddy correction and susceptibility-induced distortion correction
+
 ## Installing Prerequisites
 
 If using a managed system such as Bluehive (UofR), Longleaf (UNC), or Sherlock (Stanford) with Slurm and module management included, prerequisites should be able to be installed using commands similar to these:
