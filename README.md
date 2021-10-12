@@ -8,7 +8,7 @@ What you will need:
 2. Multi-shell dwi data
 3. Resting-state fMRI data
 
-The data are assumed to be minimaly preprocessed using FSL's pipeline - i.e., eddy correction and susceptibility-induced distortion correction
+The data are assumed to be minimaly preprocessed - i.e., using FSL's pipeline to perforrm eddy correction and susceptibility-induced distortion correction.
 
 ## Installing Prerequisites
 
