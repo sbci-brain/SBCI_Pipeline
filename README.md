@@ -22,9 +22,11 @@ module load git
 
 Otherwise, steps for installing some of the prerequisite software are included later in this document.
 
+It's recommended that you create a `.bashrc_sbci` file in your home folder and add these lines (along with others mentioned below) to a `.bashrc_sbci` file so that you can source it everytime the pipeline is sent to a cluster. See the section **Using a Bashrc File** for more information.
+
 ### Setting up the Python Environment 
 
-The following commands set up a clean Python 2.7 environment with all the neccesary packages installed. If a module is not available (or undesired), it's possible to download the latest anaconda2 here: https://repo.anaconda.com/archive/
+If you have Anaconda installed (either through a module or manually, see below), the following commands set up a clean Python 2.7 environment with all the neccesary packages installed. If a module is not available (or undesired), it's possible to download the latest anaconda2 here: https://repo.anaconda.com/archive/
 
 ```
 conda create -n sbci python=2.7
@@ -48,7 +50,13 @@ pip install fury==0.4.0
 pip install dipy==0.16.0
 pip install trimeshpy==0.0.2
 ```
- 
+
+Append the following line to `.bashrc_sbci` (or the script file that's executed when a user logs in), so that the correct Python environment is running each time the pipeline is used.
+
+```
+conda activate sbci
+```
+
 ### Installing the SBCI Pipeline
 
 Clone the SBCI pipeline: `git clone https://github.com/sbci-brain/SBCI_Pipeline.git`; move `SBCI_Pipeline/third_party/scilpy_set.zip` to a local folder, e.g.,`/home/yourname/set`; and unzip it. Then run the following commands to install SET (Surface Enhanced Tractography):
@@ -82,7 +90,7 @@ SBCI should now be installed. Check scripts in `HCP_example` for an example of h
 	export template_dir="/home/mcole22/abcd_psc_pipeline/mni_152_sym_09c".
 	```
 - **Note**: The script `preproc_step4_fmri.sh` will need to be modified, depending on how the fMRI data are to be processed.
-- For freesurfer to run correctly, append the following lines to `.bashrc` (or the script file that's executed when a user logs in), editing depending on where the installation of Freesurfer is.
+- For freesurfer to run correctly, append the following lines to `.bashrc_sbci` (or the script file that's executed when a user logs in), editing depending on where the installation of Freesurfer is.
 
 	``` 
 	export PATH="/nas/longleaf/apps/freesurfer/6.0.0/freesurfer/fsfast/bin:$PATH"
@@ -113,11 +121,13 @@ Clone the PSC pipeline: `git clone https://github.com/zhengwu/PSC_Pipeline.git`;
 
 If using a system without module management, prerequisites can be installed manually:
 
+- **Anaconda**: Follow the insctructions [here](https://docs.anaconda.com/anaconda/install/linux/)
+
 - **Freesurfer**: Follow the instructions [here](https://surfer.nmr.mgh.harvard.edu/fswiki/rel6downloads); if using Ubuntu, libpng12 might be an issue (see solution [here](https://www.linuxuprising.com/2018/05/fix-libpng12-0-missing-in-ubuntu-1804.html)). 
 
 - **mrtrix**: `conda install -c mrtrix3 mrtrix3`
 
-- **ANTs**: Download and unzip and copy of ANTs [here](http://stnava.github.io/ANTs/) and place in a suitable folder (`/home/yourname/Software/ANTs`, for example). After the installation is done, append the following lines to `.bashrc` (or the script file that's executed when a user logs in).
+- **ANTs**: Download and unzip and copy of ANTs [here](http://stnava.github.io/ANTs/) and place in a suitable folder (`/home/yourname/Software/ANTs`, for example). After the installation is done, append the following lines to `.bashrc_sbci` (or the script file that's executed when a user logs in).
 	    
 	```
 	export ANTSPATH=/home/yourname/Software/ANTs/install/bin #this is the ants bin path
@@ -130,3 +140,36 @@ If using a system without module management, prerequisites can be installed manu
 	antsRegistrationSyN.sh #should print out the usage for that script.
 	```
 - **FSL**: Follow the instructions [here](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation/).
+
+## Using a Bashrc File
+
+So that the working environment is the same each time the pipeline is run, it is recommended to create a `.bashrc_sbci` to be sourced each time the pipeline is run. The following is an example of a .bashrc file that works for Longleaf at time of writing. Just change `/PATH/TO/PSC_PIPELINE/` to the location of the PSC installation.
+
+```
+# .bashrc
+
+module load qt/5.8.0 gcc/6.3.0 mrtrix3/3.0rc3 freesurfer/6.0.0 ants/2.3.1 fsl/5.0.9
+module load java/10.0.2 matlab/2017b dcm2niix/1.0.20190902 pigz/2.6 anaconda/4.3.0
+module load git
+
+module unload python
+
+# Needed to make conda play nice on longleaf
+source /nas/longleaf/apps/anaconda/4.3.0/anaconda/etc/profile.d/conda.sh
+
+# Direct to Freesurfer installation
+export PATH="/nas/longleaf/apps/freesurfer/6.0.0/freesurfer/fsfast/bin:$PATH"
+export PATH="/nas/longleaf/apps/freesurfer/6.0.0/freesurfer/fsfast/toolbox:$PATH"
+
+# Direct to the PSC installation
+export PATH="/PATH/TO/PSC_PIPELINE/scripts:$PATH"
+export PYTHONPATH="/PATH/TO/PSC_PIPELINE:$PYTHONPATH"
+
+# Direct to the Ants installation
+export ANTSPATH="/nas/longleaf/apps/ants/2.3.1/src/build/bin/"
+
+source /nas/longleaf/apps/freesurfer/6.0.0/freesurfer/SetUpFreeSurfer.sh
+
+# Load the Python environment
+conda activate sbci
+```
