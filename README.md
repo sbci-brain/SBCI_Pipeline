@@ -85,10 +85,11 @@ Test the SET installation with `scil_surface.py`, you should see:
 
 SBCI should now be installed. Check scripts in `HCP_example` for an example of how to use the SBCI pipeline on some sample HCP (Human Connectome Project) data. 
 - **Note:** The sbci_config file needs to be updated according to the local computing environment.
-- **Note**: Line 12 of the script `preproc_step2_t1_dwi_registration.sh` will need to be modified to point to the appropriate template: 
+- **Note**: Line 12 of the script `preproc_step2_t1_dwi_registration.sh` will need to be modified to point to the appropriate template. A template has been included in this repository in the folder `data/mni_152_sym_09c`, so make the followinig modification: 
 	```
-	export template_dir="/home/mcole22/abcd_psc_pipeline/mni_152_sym_09c".
+	export template_dir="/PATH/TO/SBCI_PIPELINE/data/mni_152_sym_09c".
 	```
+	Changing `/PATH/TO/SBCI_PIPELINE/' to the location of your installation of SBCI.
 - **Note**: The script `preproc_step4_fmri.sh` will need to be modified, depending on how the fMRI data are to be processed.
 - For freesurfer to run correctly, append the following lines to `.bashrc_sbci` (or the script file that's executed when a user logs in), editing depending on where the installation of Freesurfer is.
 
