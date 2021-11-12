@@ -121,7 +121,12 @@ Clone the PSC pipeline: `git clone https://github.com/zhengwu/PSC_Pipeline.git`;
 
 If using a system without module management, prerequisites can be installed manually:
 
-- **Anaconda**: Follow the insctructions [here](https://docs.anaconda.com/anaconda/install/linux/)
+- **Anaconda**: Follow the insctructions [here](https://docs.anaconda.com/anaconda/install/linux/); Test the installatioin by running the command `which python`. Ih there are issues, try adding the anaconda path to `.bashrc_sbci` (or the script file that's executed when a user logs in), like so.
+
+	```
+	export PATH="/PATH/TO/ANACONDA/bin:$PATH"
+	```
+	Replacing `/PATH/TO/ANACONDA/` with the location of the anaconda installation.
 
 - **Freesurfer**: Follow the instructions [here](https://surfer.nmr.mgh.harvard.edu/fswiki/rel6downloads); if using Ubuntu, libpng12 might be an issue (see solution [here](https://www.linuxuprising.com/2018/05/fix-libpng12-0-missing-in-ubuntu-1804.html)). 
 
