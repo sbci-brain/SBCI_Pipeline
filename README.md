@@ -91,11 +91,12 @@ SBCI should now be installed. Check scripts in `HCP_example` for an example of h
 	```
 	Changing `/PATH/TO/SBCI_PIPELINE/` to the location of your installation of SBCI. This will be moved out of the script in future versions of the pipeline and into the sbci_config file.
 - **Note**: The script `preproc_step4_fmri.sh` will need to be modified, depending on how the fMRI data are to be processed.
-- For freesurfer to run correctly, append the following lines to `.bashrc_sbci` (or the script file that's executed when a user logs in), editing depending on where the installation of Freesurfer is.
+- For freesurfer, FSL and ANTs to run correctly, append the following lines to `.bashrc_sbci` (or the script file that's executed when a user logs in), editing depending on where the installation of Freesurfer is.
 
 	``` 
 	export PATH="/nas/longleaf/apps/freesurfer/6.0.0/freesurfer/fsfast/bin:$PATH"
 	export PATH="/nas/longleaf/apps/freesurfer/6.0.0/freesurfer/fsfast/toolbox:$PATH"
+	export PATH="/nas/longleaf/apps/ants/2.3.1/src/ANTs-2.3.1/Scripts:$PATH"
 
 	source /nas/longleaf/apps/freesurfer/6.0.0/freesurfer/SetUpFreeSurfer.sh
 	```
