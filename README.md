@@ -96,7 +96,9 @@ SBCI should now be installed. Check scripts in `HCP_example` for an example of h
 	``` 
 	export PATH="/nas/longleaf/apps/freesurfer/6.0.0/freesurfer/fsfast/bin:$PATH"
 	export PATH="/nas/longleaf/apps/freesurfer/6.0.0/freesurfer/fsfast/toolbox:$PATH"
+	
 	export PATH="/nas/longleaf/apps/ants/2.3.1/src/ANTs-2.3.1/Scripts:$PATH"
+	export ANTSPATH="/nas/longleaf/apps/ants/2.3.1/src/build/bin/"
 
 	source /nas/longleaf/apps/freesurfer/6.0.0/freesurfer/SetUpFreeSurfer.sh
 	```
