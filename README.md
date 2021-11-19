@@ -107,7 +107,7 @@ Clone the PSC pipeline: `git clone https://github.com/zhengwu/PSC_Pipeline.git`;
  - Check if the installation is successful: 
 
 	 ```
- 	:~$conda activate set27
+ 	:~$conda activate sbci
  	:~$extraction_sccm_withfeatures_cortical.py 
  	usage: extraction_sccm_withfeatures_cortical.py [-h] [--save_sl ]
  	                                                [--save_diffusion ]
