@@ -120,7 +120,11 @@ Clone the PSC pipeline: `git clone https://github.com/zhengwu/PSC_Pipeline.git`;
  	                                                DILATION_WINDSIZE INROILEN PRE
  	extraction_sccm_withfeatures_cortical.py: error: too few arguments
 	 ```
- 
+ 	Run the following commands to validate the installation: 
+	```
+	which antsRegistration #should print out the full path to antsRegistration, and
+	antsRegistrationSyN.sh #should print out the usage for that script.
+	```
 ### Alternative Installation of Prerequisites
 
 If using a system without module management, prerequisites can be installed manually:
