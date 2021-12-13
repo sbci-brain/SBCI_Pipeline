@@ -1,0 +1,128 @@
+Sourcing SBCI config file
+Begin processing SBCI grid: Fri Nov  5 14:26:24 EDT 2021
+Saving /scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/lh_white_avg.vtk as a surface
+Saving /scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/rh_white_avg.vtk as a surface
+Saving /scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/lh_sphere_avg.vtk as a surface
+Saving /scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/rh_sphere_avg.vtk as a surface
+Saving /scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/lh_inflated_avg.vtk as a surface
+Saving /scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/rh_inflated_avg.vtk as a surface
+/scratch/mcole22/set_py27/lib/python2.7/site-packages/vtk/util/numpy_support.py:137: FutureWarning: Conversion of the second argument of issubdtype from `complex` to `np.complexfloating` is deprecated. In future, it will be treated as `np.complex128 == np.dtype(complex).type`.
+  assert not numpy.issubdtype(z.dtype, complex), \
+/scratch/mcole22/set_py27/lib/python2.7/site-packages/vtk/util/numpy_support.py:137: FutureWarning: Conversion of the second argument of issubdtype from `complex` to `np.complexfloating` is deprecated. In future, it will be treated as `np.complex128 == np.dtype(complex).type`.
+  assert not numpy.issubdtype(z.dtype, complex), \
+/scratch/mcole22/set_py27/lib/python2.7/site-packages/vtk/util/numpy_support.py:137: FutureWarning: Conversion of the second argument of issubdtype from `complex` to `np.complexfloating` is deprecated. In future, it will be treated as `np.complex128 == np.dtype(complex).type`.
+  assert not numpy.issubdtype(z.dtype, complex), \
+/scratch/mcole22/set_py27/lib/python2.7/site-packages/vtk/util/numpy_support.py:137: FutureWarning: Conversion of the second argument of issubdtype from `complex` to `np.complexfloating` is deprecated. In future, it will be treated as `np.complex128 == np.dtype(complex).type`.
+  assert not numpy.issubdtype(z.dtype, complex), \
+/scratch/mcole22/set_py27/lib/python2.7/site-packages/vtk/util/numpy_support.py:137: FutureWarning: Conversion of the second argument of issubdtype from `complex` to `np.complexfloating` is deprecated. In future, it will be treated as `np.complex128 == np.dtype(complex).type`.
+  assert not numpy.issubdtype(z.dtype, complex), \
+/scratch/mcole22/set_py27/lib/python2.7/site-packages/vtk/util/numpy_support.py:137: FutureWarning: Conversion of the second argument of issubdtype from `complex` to `np.complexfloating` is deprecated. In future, it will be treated as `np.complex128 == np.dtype(complex).type`.
+  assert not numpy.issubdtype(z.dtype, complex), \
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/lh_white_avg_ids_0.99.npz".
+INFO:root:Loading and resampling the .vtk surface.
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/rh_white_avg_ids_0.99.npz".
+INFO:root:Loading and resampling the .vtk surface.
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/lh_sphere_avg_0.99.vtk".
+INFO:root:Loading and resampling .vtk surface.
+INFO:root:Merged 0 points during triangulation.
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/rh_sphere_avg_0.99.vtk".
+INFO:root:Loading and resampling .vtk surface.
+INFO:root:Merged 1 points during triangulation.
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/mapping_avg_0.99.npz".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/mapping_avg_0.99.mat".
+INFO:root:Loading .vtk surfaces, mapping, and intersections.
+INFO:root:Snapping mesh to nearest downsampled vertices.
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/lh_white_avg_lps_0.99.vtk".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/rh_white_avg_lps_0.99.vtk".
+INFO:root:Loading and resampling .vtk surface.
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/lh_inflated_avg_lps_0.99.vtk".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/rh_inflated_avg_lps_0.99.vtk".
+INFO:root:Loading and resampling .vtk surface.
+INFO:root:Loading and converting the .vtk surface.
+INFO:root:Loading and converting the .vtk surface.
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/lh_grid_avg_0.99.m".
+INFO:root:Loading and normalising the .m surface.
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/rh_grid_avg_0.99.m".
+INFO:root:Loading and normalising the .m surface.
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/lh_grid_avg_0.99.vtk".
+INFO:root:Loading and normalising the .vtk surface.
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/rh_grid_avg_0.99.vtk".
+INFO:root:Loading and normalising the .vtk surface.
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/lh_sphere_avg_norm.vtk".
+INFO:root:Loading and normalising the .vtk surface.
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/rh_sphere_avg_norm.vtk".
+INFO:root:Loading and normalising the .vtk surface.
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/grid_coords_0.99.mat".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/grid_coords_0.99.npz".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/adjacency_0.99.mat".
+Processing Parcellation: aparc.a2005s
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/aparc.a2005s_avg_roi_0.99.npz".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/aparc.a2005s_avg_roi_0.99.npz".
+INFO:root:Number of LH vertices: 1834
+INFO:root:Number of RH vertices: 1827
+INFO:root:Number of LH ROIs: 77
+INFO:root:Number of RH ROIs: 77
+Processing Parcellation: aparc.a2009s
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/aparc.a2009s_avg_roi_0.99.npz".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/aparc.a2009s_avg_roi_0.99.npz".
+INFO:root:Number of LH vertices: 1834
+INFO:root:Number of RH vertices: 1827
+INFO:root:Number of LH ROIs: 75
+INFO:root:Number of RH ROIs: 75
+Processing Parcellation: aparc
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/aparc_avg_roi_0.99.npz".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/aparc_avg_roi_0.99.npz".
+INFO:root:Number of LH vertices: 1834
+INFO:root:Number of RH vertices: 1827
+INFO:root:Number of LH ROIs: 35
+INFO:root:Number of RH ROIs: 35
+Processing Parcellation: oasis.chubs
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/oasis.chubs_avg_roi_0.99.npz".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/oasis.chubs_avg_roi_0.99.npz".
+INFO:root:Number of LH vertices: 1834
+INFO:root:Number of RH vertices: 1827
+INFO:root:Number of LH ROIs: 9
+INFO:root:Number of RH ROIs: 9
+Processing Parcellation: PALS_B12_Brodmann
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/PALS_B12_Brodmann_avg_roi_0.99.npz".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/PALS_B12_Brodmann_avg_roi_0.99.npz".
+INFO:root:Number of LH vertices: 1834
+INFO:root:Number of RH vertices: 1827
+INFO:root:Number of LH ROIs: 42
+INFO:root:Number of RH ROIs: 41
+Processing Parcellation: PALS_B12_Lobes
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/PALS_B12_Lobes_avg_roi_0.99.npz".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/PALS_B12_Lobes_avg_roi_0.99.npz".
+INFO:root:Number of LH vertices: 1834
+INFO:root:Number of RH vertices: 1827
+INFO:root:Number of LH ROIs: 6
+INFO:root:Number of RH ROIs: 6
+Processing Parcellation: PALS_B12_OrbitoFrontal
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/PALS_B12_OrbitoFrontal_avg_roi_0.99.npz".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/PALS_B12_OrbitoFrontal_avg_roi_0.99.npz".
+INFO:root:Number of LH vertices: 1834
+INFO:root:Number of RH vertices: 1827
+INFO:root:Number of LH ROIs: 21
+INFO:root:Number of RH ROIs: 24
+Processing Parcellation: PALS_B12_Visuotopic
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/PALS_B12_Visuotopic_avg_roi_0.99.npz".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/PALS_B12_Visuotopic_avg_roi_0.99.npz".
+INFO:root:Number of LH vertices: 1834
+INFO:root:Number of RH vertices: 1827
+INFO:root:Number of LH ROIs: 13
+INFO:root:Number of RH ROIs: 13
+Processing Parcellation: Yeo2011_17Networks_N1000
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/Yeo2011_17Networks_N1000_avg_roi_0.99.npz".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/Yeo2011_17Networks_N1000_avg_roi_0.99.npz".
+INFO:root:Number of LH vertices: 1834
+INFO:root:Number of RH vertices: 1827
+INFO:root:Number of LH ROIs: 18
+INFO:root:Number of RH ROIs: 18
+Processing Parcellation: Yeo2011_7Networks_N1000
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/Yeo2011_7Networks_N1000_avg_roi_0.99.npz".
+INFO:root:Overwriting "/scratch/dmi/zzhang87_lab/mcole22/SBCI/CogTE/SBCI_AVG/Yeo2011_7Networks_N1000_avg_roi_0.99.npz".
+INFO:root:Number of LH vertices: 1834
+INFO:root:Number of RH vertices: 1827
+INFO:root:Number of LH ROIs: 8
+INFO:root:Number of RH ROIs: 8
+Finished processing SBCI grid: Fri Nov  5 14:28:19 EDT 2021
