@@ -85,18 +85,27 @@ Test the SET installation with `scil_surface.py`, you should see:
 
 SBCI should now be installed. Check scripts in `HCP_example` for an example of how to use the SBCI pipeline on some sample HCP (Human Connectome Project) data. 
 - **Note:** The sbci_config file needs to be updated according to the local computing environment.
-- **Note**: Line 12 of the script `preproc_step2_t1_dwi_registration.sh` will need to be modified to point to the appropriate template: 
+- **Note**: Line 12 of the script `preproc_step2_t1_dwi_registration.sh` will need to be modified to point to the appropriate template. A template has been included in this repository in the folder `data/mni_152_sym_09c`, so make the followinig modification: 
 	```
-	export template_dir="/home/mcole22/abcd_psc_pipeline/mni_152_sym_09c".
+	export template_dir="/PATH/TO/SBCI_PIPELINE/data/mni_152_sym_09c"
 	```
+	Changing `/PATH/TO/SBCI_PIPELINE/` to the location of your installation of SBCI. This will be moved out of the script in future versions of the pipeline and into the sbci_config file.
 - **Note**: The script `preproc_step4_fmri.sh` will need to be modified, depending on how the fMRI data are to be processed.
-- For freesurfer to run correctly, append the following lines to `.bashrc_sbci` (or the script file that's executed when a user logs in), editing depending on where the installation of Freesurfer is.
+- For freesurfer, FSL and ANTs to run correctly, append the following lines to `.bashrc_sbci` (or the script file that's executed when a user logs in), editing depending on where the installation of Freesurfer is.
 
 	``` 
 	export PATH="/nas/longleaf/apps/freesurfer/6.0.0/freesurfer/fsfast/bin:$PATH"
 	export PATH="/nas/longleaf/apps/freesurfer/6.0.0/freesurfer/fsfast/toolbox:$PATH"
+	
+	export PATH="/nas/longleaf/apps/ants/2.3.1/src/ANTs-2.3.1/Scripts:$PATH"
+	export ANTSPATH="/nas/longleaf/apps/ants/2.3.1/src/build/bin/"
 
 	source /nas/longleaf/apps/freesurfer/6.0.0/freesurfer/SetUpFreeSurfer.sh
+	```
+	Run the following commands to validate the installation: 
+	```
+	which antsRegistration #should print out the full path to antsRegistration, and
+	antsRegistrationSyN.sh #should print out the usage for that script.
 	```
 
 ### Installing the PSC Pipeline
@@ -106,7 +115,7 @@ Clone the PSC pipeline: `git clone https://github.com/zhengwu/PSC_Pipeline.git`;
  - Check if the installation is successful: 
 
 	 ```
- 	:~$conda activate set27
+ 	:~$conda activate sbci
  	:~$extraction_sccm_withfeatures_cortical.py 
  	usage: extraction_sccm_withfeatures_cortical.py [-h] [--save_sl ]
  	                                                [--save_diffusion ]
@@ -116,7 +125,7 @@ Clone the PSC pipeline: `git clone https://github.com/zhengwu/PSC_Pipeline.git`;
  	                                                DILATION_WINDSIZE INROILEN PRE
  	extraction_sccm_withfeatures_cortical.py: error: too few arguments
 	 ```
- 
+ 	
 ### Alternative Installation of Prerequisites
 
 If using a system without module management, prerequisites can be installed manually:
