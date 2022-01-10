@@ -89,7 +89,7 @@ scil_extract_b0.py diffusion/dwi_resampled.nii.gz \
 	diffusion/flip_x.bval \
 	diffusion/flip_x.bvec \
 	diffusion/b0_resampled.nii.gz \
-	--mean --b0_thr 10 -f
+	--mean --b0_thr 10
 
 mrthreshold diffusion/b0_resampled.nii.gz diffusion/b0_mask_resampled.nii.gz --abs 0.00001
 
