@@ -1,0 +1,60 @@
+###########################################################################################
+# scbi_config: Configuration options for the SBCI pipeline
+##########################################################################################
+
+###########################################################################################
+# Change this to an identifier of the dataset being processed (for our reference)
+###########################################################################################
+DATASET_NAME=EXAMPLE_DATA
+
+###########################################################################################
+# Change these to the b-values available in the data for DTI and FODF estimation
+# ------------------------------------------------------------------------------
+# The example data have values of around 0, 1000, and 2000
+###########################################################################################
+
+DTI_BVALS=(0 1000)
+FODF_BVALS=(0 1000 2000)
+
+###########################################################################################
+# Change these to point to your local installation of SBCI
+###########################################################################################
+
+PSC_PATH=/PATH/TO/PSC_Pipeline/
+SBCI_PATH=/PATH/TO/SBCI/
+FREESURFER_PATH=/PATH/TO/freesurfer/
+OUTPUT_PATH=/PATH/TO/SBCI_AVG
+
+###########################################################################################
+# SC options: N_RUN number of times to run SET in parallel (SET)
+#             N_SEED (in 1000s) number of seeds to generate for each hemisphere (SET)
+#             STEPS flow parameter, number of steps into the surface (SET)
+#             RNG initial value for the seed of the random number generater (SET)
+#             BANDWIDTH bandwidth for smoothing SC using KDE (concon) 
+#             ROIS list of rois to generate meshes for and intersect streamlines with (SET)
+###########################################################################################
+
+N_RUNS=3
+N_SEED=1000
+STEPS=75
+RNG=1234
+BANDWIDTH=0.005
+ROIS=("4" "8" "10" "11" "12" "13" "17" "18" "26" "43" "47" "49" "50" "51" "52" "53" "54" "58" "16")
+
+###########################################################################################
+# RESOLUTION (0,1) percentage of vertex reduction
+###########################################################################################
+
+RESOLUTION=0.99
+
+###############################################################################################
+# GROUP_PARCELLATIONS [str] list of parcellations to use when calculating high res connectomes
+# To add parcellations, copy the #h.PARCELLATION.annot files to the fsaverage folder and add
+# PARCELLATION to the list below (replacing # with 'l' or 'r', and PARCELLATION with the name
+###############################################################################################
+
+GROUP_PARCELLATIONS=(
+  aparc.a2005s
+  aparc.a2009s
+  aparc
+)

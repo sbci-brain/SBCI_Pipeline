@@ -13,6 +13,10 @@
 echo "Sourcing SBCI config file"
 source ${SBCI_CONFIG}
 
+if [ -z ${TEMPLATEDIR+x} ]; then 
+    TEMPLATEDIR=${SBCI_PATH}/integrated_pipeline/mni_152_sym_09c
+fi
+
 echo "Begin T1-DWI registration preprocessing: $(date)"
 
 # folder for t1 preprocessing
@@ -89,7 +93,7 @@ scil_extract_b0.py diffusion/dwi_resampled.nii.gz \
 	diffusion/flip_x.bval \
 	diffusion/flip_x.bvec \
 	diffusion/b0_resampled.nii.gz \
-	--mean --b0_thr 10 -f
+	--mean --b0_thr 10
 
 mrthreshold diffusion/b0_resampled.nii.gz diffusion/b0_mask_resampled.nii.gz --abs 0.00001
 

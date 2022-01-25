@@ -3,6 +3,10 @@
 echo "Sourcing SBCI config file"
 source ${SBCI_CONFIG}
 
+if [ -z ${SCRIPT_PATH+x} ]; then 
+    SCRIPT_PATH=${SBCI_PATH}/scripts
+fi
+
 RUN=$1
 
 echo "Begin processing SET: $(date)"

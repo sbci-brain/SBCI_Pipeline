@@ -3,8 +3,6 @@
 echo "Begin preparing data: $(date)"
 
 # flip T1
-# already flipped, so no need for the BIS data!
-
 cd anat
 mrconvert *_T1w.nii.gz -stride 1,2,3 t1.nii.gz -force
 cd ..

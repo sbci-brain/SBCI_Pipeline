@@ -2,6 +2,10 @@
 
 source ${SBCI_CONFIG}
 
+if [ -z ${REFDIR+x} ]; then 
+    REFDIR=${SBCI_PATH}/integrated_pipeline/fsaverage
+fi
+
 ##########################################################
 # CALCULATE FUNCTIONAL BOLD TIME SERIES AND CONNECTIVITY #
 ##########################################################
@@ -30,7 +34,7 @@ while IFS= read -r -d '' FCDIR; do
   # Step2) Calculate FC matrix at the given resolution in template space
   python ${SCRIPT_PATH}/calculate_fc.py \
          --time_series ${FCOUTPUTDIR}/fc_ts.npz \
-         --mesh ${AVGDIR}/mapping_avg_${RESOLUTION}.npz \
+         --mesh ${OUTPUT_PATH}/mapping_avg_${RESOLUTION}.npz \
          --output ${FCOUTPUTDIR}/fc_avg_${RESOLUTION}.mat -f
 
   run=$((run + 1))

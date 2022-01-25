@@ -6,6 +6,10 @@ source ${SBCI_CONFIG}
 OUTPUTDIR=dwi_pipeline/sbci_connectome
 SCDIR=dwi_pipeline/structure/t1_freesurfer
 
+if [ -z ${SCRIPT_PATH+x} ]; then 
+    SCRIPT_PATH=${SBCI_PATH}/scripts
+fi
+
 echo "Begin processing SBCI surfaces: $(date)"
 mkdir -p ${OUTPUTDIR}
 
