@@ -38,7 +38,7 @@ mapfile -t subjects < ${IN}
 
 # make sure there are subjects
 if [[ ${#subjects[@]} -eq 0 ]]; then
-    echo "no subjects found in ${1}"
+    echo "no subjects found in ${IN}"
     exit 1
 fi
 
@@ -50,7 +50,7 @@ for i in $(seq 1 ${#subjects[@]}); do
     idx=$((i - 1))
     cd ${OUT}/${subjects[$idx]}
 
-    echo "Placing subject ${subjects[$idx]}"
+    echo "Placing subject ${subjects[$idx]} in queue"
 
     mkdir -p dwi_pipeline
 
@@ -81,7 +81,7 @@ for i in $(seq 1 ${#subjects[@]}); do
     STEP5=$(sb $OPTIONS --time=4-0:00:00 --mem=10g --job-name=$JID.${subjects[$idx]}.preproc.step5 \
         --export=ALL,SBCI_CONFIG \
         --output=preproc_step5_fmri.log \
-        ${SCRIPTS}/preproc_step5_fmri.sh
+        ${SCRIPTS}/preproc_step5_fmri.sh \
         --dependency=afterok:${STEP4} ${SCRIPTS}/preproc_step5_fmri.sh)
 
     cd ${rootdir}

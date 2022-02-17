@@ -1,5 +1,9 @@
 #!/bin/bash
 
+IN=${1}
+OUT=${2}
+SCRIPTS=${3}
+
 # CHANGE LOCATION TO YOUR SOURCE FILE
 echo "Sourcing .bashrc"
 source /home/mcole22/.bashrc-set
@@ -28,20 +32,16 @@ function sb() {
 JID=$(uuidgen | tr '-' ' ' | awk {'print $1}')
 
 # get all subject names
-mapfile -t subjects < $1
+mapfile -t subjects < ${IN}
 
 # make sure there are subjects
 if [[ ${#subjects[@]} -eq 0 ]]; then
-    echo "no subjects found in ${1}"
+    echo "no subjects found in ${IN}"
     exit 1
 fi
 
 echo "Processing ${#subjects[@]} subject(s): ${JID}"
 
-OUT=${2}
-SCRIPTS=${3}
-
-declare -a phases=("S1P1" "S3P1" "S3P2" "S6P1" "S6P2")
 
 for i in $(seq 1 ${#subjects[@]}); do
     idx=$((i - 1))
@@ -64,3 +64,19 @@ for i in $(seq 1 ${#subjects[@]}); do
     done
 done
 
+echo "Processing ${#subjects[@]} subject(s): ${JID}"
+
+rootdir=$(pwd)
+
+for i in $(seq 1 ${#subjects[@]}); do
+    idx=$((i - 1))
+    cd ${OUT}/${subjects[$idx]}
+
+    echo "Placing subject ${subjects[$idx]} in queue"
+
+    STEP1=$(sb $OPTIONS --time=48:00:00 --mem=15g --job-name=$JID.step1 \
+        --export=ALL,SBCI_CONFIG \
+        --output=psc_step1_tractography.log ${SCRIPTS}/psc_step1_tractography.sh)
+
+    cd ${rootdir}
+done

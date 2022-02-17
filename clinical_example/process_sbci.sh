@@ -1,5 +1,9 @@
 #!/bin/bash
 
+IN=${1}
+OUT=${2}
+SCRIPTS=${3}
+
 # CHANGE LOCATION TO YOUR SOURCE FILE
 echo "Sourcing .bashrc"
 source /home/mcole22/.bashrc-set
@@ -26,18 +30,15 @@ function sb() {
 JID=$(uuidgen | tr '-' ' ' | awk {'print $1}')
 
 # get all subject names
-mapfile -t subjects < $1
+mapfile -t subjects < ${IN}
 
 # make sure there are subjects
 if [[ ${#subjects[@]} -eq 0 ]]; then
-    echo "no subjects found in ${1}"
+    echo "no subjects found in ${IN}"
     exit 1
 fi
 
 echo "Processing ${#subjects[@]} subject(s)"
-
-OUT=${2}
-SCRIPTS=${3}
 
 echo "Beginning processing of SBCI grid: $(date)"
 STEP1=$(sb ${OPTIONS} --time=4:00:00 --mem=4g --job-name=$JID.step1 \
@@ -59,16 +60,12 @@ for i in $(seq 1 ${#subjects[@]}); do
         --output=sbci_step2_prepare_set.log \
         --dependency=afterok:${STEP1} ${SCRIPTS}/sbci_step2_prepare_set.sh)
 
-    sleep 0.01
-
     STEP3=()
     for ((RUN = 1; RUN <= N_RUNS; RUN++)); do
         STEP3+=($(sb ${OPTIONS} --time=40:00:00 --mem=20g --job-name=$JID.step3-4.${subjects[$idx]} \
             --export=ALL,SBCI_CONFIG \
             --output=sbci_step3_set_${RUN}.log \
             --dependency=afterok:${STEP2} ${SCRIPTS}/sbci_step3_run_set.sh $RUN))
-
-        sleep 0.01
 
     done
 
@@ -77,22 +74,15 @@ for i in $(seq 1 ${#subjects[@]}); do
         --output=sbci_step4_process_surfaces.log \
         --dependency=singleton ${SCRIPTS}/sbci_step4_process_surfaces.sh)
 
-    sleep 0.01
-
     STEP5=$(sb ${OPTIONS} --time=20:00:00 --mem=20g --job-name=$JID.step5.${subjects[$idx]} \
         --export=ALL,SBCI_CONFIG \
         --output=sbci_step5_structural.log \
         --dependency=afterok:${STEP4} ${SCRIPTS}/sbci_step5_structural.sh)
 
-    sleep 0.01
-
-    STEP6=$(sb ${OPTIONS} --time=10:00:00 --mem=20g --job-name=$JID.step6.${subjects[$idx]} \
-        --export=ALL,SBCI_CONFIG \
-        --output=sbci_step6_functional.log \
-        ${SCRIPTS}/sbci_step6_functional.sh)
-        #--dependency=afterok:${STEP1} ${SCRIPTS}/sbci_step6_functional.sh)
-
-    sleep 0.01
+    # STEP6=$(sb ${OPTIONS} --time=10:00:00 --mem=20g --job-name=$JID.step6.${subjects[$idx]} \
+    #    --export=ALL,SBCI_CONFIG \
+    #    --output=sbci_step6_functional.log \
+    #    --dependency=afterok:${STEP1} ${SCRIPTS}/sbci_step6_functional.sh)
 
     cd ${ROOT}
 done
