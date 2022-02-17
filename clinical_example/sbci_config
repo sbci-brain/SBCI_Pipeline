@@ -46,15 +46,3 @@ ROIS=("4" "8" "10" "11" "12" "13" "17" "18" "26" "43" "47" "49" "50" "51" "52" "
 ###########################################################################################
 
 RESOLUTION=0.99
-
-###############################################################################################
-# GROUP_PARCELLATIONS [str] list of parcellations to use when calculating high res connectomes
-# To add parcellations, copy the #h.PARCELLATION.annot files to the fsaverage folder and add
-# PARCELLATION to the list below (replacing # with 'l' or 'r', and PARCELLATION with the name
-###############################################################################################
-
-GROUP_PARCELLATIONS=(
-  aparc.a2005s
-  aparc.a2009s
-  aparc
-)

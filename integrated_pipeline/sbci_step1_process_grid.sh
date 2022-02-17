@@ -105,22 +105,30 @@ python ${SCRIPT_PATH}/get_coords.py --lh_surface ${OUTPUT_PATH}/lh_grid_avg_${RE
 python ${SCRIPT_PATH}/get_coords.py --lh_surface ${OUTPUT_PATH}/lh_grid_avg_${RESOLUTION}.vtk --rh_surface ${OUTPUT_PATH}/rh_grid_avg_${RESOLUTION}.vtk --output ${OUTPUT_PATH}/grid_coords_${RESOLUTION}.npz -f
 python ${SCRIPT_PATH}/get_adjacency_matrix.py --lh_surface ${OUTPUT_PATH}/lh_grid_avg_${RESOLUTION}.vtk --rh_surface ${OUTPUT_PATH}/rh_grid_avg_${RESOLUTION}.vtk --output ${OUTPUT_PATH}/adjacency_${RESOLUTION}.mat -f
 
-#######################################
-# LOOP THROUGH SELECTED PARCELLATIONS #
-#######################################
+########################################
+# LOOP THROUGH AVAILABLE PARCELLATIONS #
+########################################
 
-for PARCELLATION in ${GROUP_PARCELLATIONS[*]}; do
+GROUP_PARCELLATIONS=($(ls ${REFDIR}/label/lh.*.annot))
 
-  echo Processing Parcellation: ${PARCELLATION}
-      
-  # Step6) Calculate atlas' for the downsampled mesh
-  python ${SCRIPT_PATH}/group_roi_vertices.py \
-         --lh_annot ${REFDIR}/label/lh.${PARCELLATION}.annot \
-         --rh_annot ${REFDIR}/label/rh.${PARCELLATION}.annot \
-         --mesh ${OUTPUT_PATH}/mapping_avg_${RESOLUTION}.npz \
-         --output ${OUTPUT_PATH}/${PARCELLATION}_avg_roi_${RESOLUTION}.npz \
-         --matlab ${OUTPUT_PATH}/${PARCELLATION}_avg_roi_${RESOLUTION}.mat -f
+for PARCELLATION_FILE in ${GROUP_PARCELLATIONS[*]}; do
 
+  PARCELLATION=${PARCELLATION_FILE##*lh.}
+  PARCELLATION=${PARCELLATION%*.annot}
+
+  if [ -f "${REFDIR}/label/rh.${PARCELLATION}.annot" ]; then
+
+    echo Processing Parcellation: ${PARCELLATION}
+        
+    # Step6) Calculate atlas' for the downsampled mesh
+    python ${SCRIPT_PATH}/group_roi_vertices.py \
+           --lh_annot ${REFDIR}/label/lh.${PARCELLATION}.annot \
+           --rh_annot ${REFDIR}/label/rh.${PARCELLATION}.annot \
+           --mesh ${OUTPUT_PATH}/mapping_avg_${RESOLUTION}.npz \
+           --output ${OUTPUT_PATH}/${PARCELLATION}_avg_roi_${RESOLUTION}.npz \
+           --matlab ${OUTPUT_PATH}/${PARCELLATION}_avg_roi_${RESOLUTION}.mat -f
+
+  fi
 done
 
 echo "Finished processing SBCI grid: $(date)"
