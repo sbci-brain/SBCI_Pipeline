@@ -73,6 +73,19 @@ Now the data are ready to be processed through SBCI. The following steps need to
 * [sbci_step5_structural.sh](https://github.com/sbci-brain/SBCI_Pipeline/blob/master/integrated_pipeline/sbci_step5_structural.sh "sbci_step5_structural.sh"): Calculates the structural connectivity matrix for a subject.
 * [sbci_step6_functional.sh](https://github.com/sbci-brain/SBCI_Pipeline/blob/master/integrated_pipeline/sbci_step6_functional.sh "sbci_step6_functional.sh"): Calculates the functional connectivity matrix for a subject. This step cannot be run in the example because we have no resting state fMRI.
 
+### Automated process
+
+Included in this example are three scripts that will automatically run all the preprocessing steps, SBCI steps, and PSC steps, respectively. Each script takes the same three inputs:
+
+* A file containing all the subject names you wish to process, 
+* The base path containing all the subject data
+* the path to the integrated_pipeline folder included in this repository
+
+To run the preprocessing for this example, edit the indicated lines within each of the three scripts, then run them like so: 
+
+* `./preprocess subject_list /PATH/TO/SBCI/integrated_pipeline/ /PATH/TO/example_dataset/`
+
+Be sure to let each script finish before starting the next.
 
 ### Checking the results
 
