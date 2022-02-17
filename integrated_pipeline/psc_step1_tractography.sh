@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Sourcing SBCI config file"
+source ${SBCI_CONFIG}
+
 # fiber tracking
 cd dwi_pipeline
 mkdir psc_streamlines
