@@ -103,7 +103,7 @@ mrthreshold diffusion/b0_resampled.nii.gz diffusion/b0_mask_resampled.nii.gz --a
 ################################################################### 
 
 # denoise and bias field correction for t1 image 
-scil_run_nlmeans.py ../../t1.nii.gz structure/t1_denoised.nii.gz 1 --noise_est basic -f
+scil_run_nlmeans.py t1.nii.gz structure/t1_denoised.nii.gz 1 --noise_est basic -f
 
 N4BiasFieldCorrection -i structure/t1_denoised.nii.gz \
         -o [structure/t1_n4.nii.gz, structure/bias_field_t1.nii.gz] \
