@@ -13,7 +13,7 @@ mrconvert *_dwi.nii.gz -stride 1,2,3,4 flipped_data.nii.gz -force
 scil_convert_gradient_fsl_to_mrtrix.py *_dwi.bval *_dwi.bvec encoding.b  -f
 scil_flip_grad.py --mrtrix encoding.b encoding_x.b x -f
 scil_convert_gradient_mrtrix_to_fsl.py encoding_x.b flip_x.bval flip_x.bvec -f 
-cd..
+cd ..
 
 # move final files to one folder
 mkdir dwi_pipeline
