@@ -8,7 +8,8 @@ SCRIPTS=${3}
 echo "Sourcing .bashrc"
 source /home/mcole22/.bashrc-set
 
-module load mrtrix3/b3
+#MAY PRODUCE ERROR IF THE SYSTEM DOES NOT HAVE mrtrix3/3.0.3 INSTALLED
+module load mrtrix3/3.0.3
 module load matlab
 
 
