@@ -16,7 +16,7 @@ scil_convert_gradient_mrtrix_to_fsl.py encoding_x.b flip_x.bval flip_x.bvec -f
 cd ..
 
 # move final files to one folder
-mkdir dwi_pipeline
+mkdir -p dwi_pipeline
 cd dwi_pipeline
 
 mv ../anat/t1.nii.gz t1.nii.gz
