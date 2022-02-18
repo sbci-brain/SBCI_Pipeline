@@ -15,7 +15,7 @@ The data are assumed to be minimaly preprocessed - i.e., using FSL's pipeline to
 If using a managed system such as Bluehive (UofR), Longleaf (UNC), or Sherlock (Stanford) with Slurm and module management included, prerequisites should be able to be installed using commands similar to these:
 
 ```
-module load qt/5.8.0 gcc/6.3.0 mrtrix3/3.0rc3 freesurfer/6.0.0 ants/2.3.1 fsl/5.0.9
+module load qt/5.8.0 gcc/6.3.0 mrtrix3/3.0.3 freesurfer/6.0.0 ants/2.3.1 fsl/5.0.9
 module load java/10.0.2 matlab/2017b dcm2niix/1.0.20190902 pigz/2.6 anaconda/4.3.0
 module load git
 ```
