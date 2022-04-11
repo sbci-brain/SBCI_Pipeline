@@ -1,6 +1,7 @@
 import argparse
 import logging
 import vtk
+import re
 
 import numpy as np
 
@@ -19,7 +20,7 @@ def _build_args_parser():
                    type=str, help='Path of the .npz file to save the output to.')
 
     p.add_argument('--resolution', action='store', metavar='REDUCTION', required=True,
-                   type=int, help='Resolution from 0-7 corresponding to 2 + (10*4^n) vertices')
+                   type=str, help='Resolution from 0-7 corresponding to 2 + (10*4^n) vertices')
 
     p.add_argument('-f', action='store_true', dest='overwrite',
                    help='If set, overwrite files if they already exist.')
@@ -46,14 +47,18 @@ def main():
         if args.overwrite:
             logging.info('Overwriting "{0}".'.format(args.output))
         else:
-            parser.error('The file "{0}" already exists. Use -f to overwrite it.'.format(args.output))
+            logging.error('The file "{0}" already exists. Use -f to overwrite it.'.format(args.output))
+
+    res = re.findall(r"\d+", args.resolution)
+    res = int(res[-1])
 
     # make sure the resolution is between 0-7
-    if args.resolution > 7 or args.resolution < 0:
-        parser.error('Reduction percentage must be between than (0,1).')
+    if res > 7 or res < 0:
+        logging.error('Ico surface must be between (0,7).')
 
     # perform the downsampling
-    result = np.arange(0, 2 + (10*4**args.resolution), 1)
+    logging.info('Resampling to icosphere resolution: {0}.'.format(res))
+    result = np.arange(0, 2 + (10*4**res), 1)
 
     # save the results
     np.savez_compressed(args.output, points=result)

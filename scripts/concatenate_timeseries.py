@@ -49,6 +49,10 @@ def main():
        time_series_data = np.load(filename)
 
        for key in time_series_data.files:
+           if key == 'subcortical_labels':
+               data[key] = time_series_data[key]
+               continue
+
            ts_std = time_series_data[key]
            ts_std = (ts_std - ts_std.mean(1, keepdims=True)) / ts_std.std(1, keepdims=True)
            ts_std = np.nan_to_num(ts_std)
@@ -61,33 +65,6 @@ def main():
     # save the results
     kwargs = {key: data[key] for key in data.keys()}
     np.savez_compressed(args.output, **kwargs)
-###
-###    time_series_lh = None
-###    time_series_rh = None
-###
-###    for filename in args.time_series:
-###        time_series_data = np.load(filename)
-###
-###        ts_std = time_series_data['lh_time_series']
-###        ts_std = (ts_std - ts_std.mean(1, keepdims=True)) / ts_std.std(1, keepdims=True)
-###        ts_std = np.nan_to_num(ts_std)
-###
-###        if time_series_lh is None:
-###            time_series_lh = ts_std 
-###        else:
-###            time_series_lh = np.concatenate(time_series_lh, ts_std) 
-###
-###        ts_std = time_series_data['rh_time_series']
-###        ts_std = (ts_std - ts_std.mean(1, keepdims=True)) / ts_std.std(1, keepdims=True)
-###        ts_std = np.nan_to_num(ts_std)
-###
-###        if time_series_rh is None:
-###            time_series_rh = ts_std 
-###        else:
-###            time_series_rh = np.concatenate(time_series_rh, ts_std) 
-###
-    # save the results
-    #np.savez_compressed(args.output, lh_time_series=time_series_lh, rh_time_series=time_series_rh)
 
 
 if __name__ == "__main__":

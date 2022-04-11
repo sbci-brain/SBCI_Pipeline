@@ -54,7 +54,7 @@ def main():
            if line.rstrip() == "":
                continue
 
-	   if words[0] == 'Vertex':
+           if words[0] == 'Vertex':
                count = count + 1
 
         i = 0
@@ -70,7 +70,7 @@ def main():
            if line.rstrip() == "":
                continue
 
-	   if words[0] == 'Vertex':
+           if words[0] == 'Vertex':
                coords[i,0] = np.double(words[2])
                coords[i,1] = np.double(words[3])
                coords[i,2] = np.double(words[4])
@@ -84,7 +84,7 @@ def main():
         for line in inputfile:
            words = line.rstrip().split(' ')
 
-	   if words[0] == 'Vertex':
+           if words[0] == 'Vertex':
                # normalise each vertex
                area = np.sqrt(coords[index,0]**2 + coords[index,1]**2 + coords[index,2]**2)
 

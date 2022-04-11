@@ -56,7 +56,7 @@ def main():
            if line.rstrip() == "":
                continue
 
-	   if words[0] == 'POINTS':
+           if words[0] == 'POINTS':
                section = 1
                index = 1
                continue
