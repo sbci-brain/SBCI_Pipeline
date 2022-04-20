@@ -31,12 +31,8 @@ mrconvert wmparc_in_rawavg.nii.gz -stride 1,2,3 wmparc.nii.gz -force
 mrconvert aparc.a2009s+aseg_in_rawavg.mgz aparc.a2009s+aseg_in_rawavg.nii.gz -force
 mrconvert aparc.a2009s+aseg_in_rawavg.nii.gz -stride 1,2,3 aparc.a2009s+aseg.nii.gz -force
 
-# align the pacellation data to the right space since freesurfer resampled the data;
-antsRegistrationSyNQuick.sh -d 3 -f t1_warped.nii.gz -m t1_wholebrain_warped.nii.gz -o ForParcel_ -t r   
-
-# This just does a rigid registration, really quick, 
-# and just reslices wmparc to make it have the same affine and size as t1_warped.nii.gz
-antsApplyTransforms -d 3 -i wmparc.nii.gz -r t1_warped.nii.gz -o wmparc_warped_label.nii.gz -n MultiLabel -t ForParcel_0GenericAffine.mat
-antsApplyTransforms -d 3 -i aparc.a2009s+aseg.nii.gz -r t1_warped.nii.gz -o aparc.a2009s+aseg_warped_label.nii.gz -n MultiLabel -t ForParcel_0GenericAffine.mat
+# reslice wmparc to make it have the same affine and size as t1_warped.nii.gz
+antsApplyTransforms -d 3 -i wmparc.nii.gz -r t1_warped.nii.gz -o wmparc_warped_label.nii.gz -n MultiLabel
+antsApplyTransforms -d 3 -i aparc.a2009s+aseg.nii.gz -r t1_warped.nii.gz -o aparc.a2009s+aseg_warped_label.nii.gz -n MultiLabel
 
 cd ..
