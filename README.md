@@ -10,6 +10,10 @@ What you will need:
 
 The data are assumed to be minimaly preprocessed - i.e., using FSL's pipeline to perforrm eddy correction and susceptibility-induced distortion correction.
 
+**Reference**:
+
+Cole, Martin, Kyle Murray, Etienne St‐Onge, Benjamin Risk, Jianhui Zhong, Giovanni Schifitto, Maxime Descoteaux, and Zhengwu Zhang. "Surface‐Based Connectivity Integration: An atlas‐free approach to jointly study functional and structural connectivity." Human Brain Mapping 42, no. 11 (2021): 3481-3499.
+
 ## Installing Prerequisites
 
 If using a managed system such as Bluehive (UofR), Longleaf (UNC), or Sherlock (Stanford) with Slurm and module management included, prerequisites should be able to be installed using commands similar to these:
