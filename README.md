@@ -12,7 +12,7 @@ The data are assumed to be minimaly preprocessed - i.e., using FSL's pipeline to
 
 **Reference**:
 
-Cole, Martin, Kyle Murray, Etienne St‐Onge, Benjamin Risk, Jianhui Zhong, Giovanni Schifitto, Maxime Descoteaux, and Zhengwu Zhang. "Surface‐Based Connectivity Integration: An atlas‐free approach to jointly study functional and structural connectivity." Human Brain Mapping 42, no. 11 (2021): 3481-3499.
+Martin Cole, Kyle Murray, Etienne St‐Onge, Benjamin Risk, Jianhui Zhong, Giovanni Schifitto, Maxime Descoteaux, and Zhengwu Zhang. "Surface‐Based Connectivity Integration: An atlas‐free approach to jointly study functional and structural connectivity." Human Brain Mapping 42, no. 11 (2021): 3481-3499.
 
 ## Installing Prerequisites
 
