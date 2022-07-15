@@ -49,11 +49,12 @@ pip install scikit-learn==0.19.0
 pip install vtk==8.1.2
 pip install PyMCubes==0.0.9
 pip install nibabel==2.4.0
-pip install git+https://github.com/MarcCote/tractconverter@master#tractconverter
+pip install https://github.com/MarcCote/tractconverter/archive/master.zip
 pip install fury==0.4.0
 pip install dipy==0.16.0
 pip install trimeshpy==0.0.2
 ```
+**Note**: there might be errors when installing tractconverter. A rerun of the installation seems can solve the issue (line 52). 
 
 Append the following line to `.bashrc_sbci` (or the script file that's executed when a user logs in), so that the correct Python environment is running each time the pipeline is used.
 
