@@ -54,7 +54,7 @@ pip install fury==0.4.0
 pip install dipy==0.16.0
 pip install trimeshpy==0.0.2
 ```
-**Note**: there might be errors when installing tractconverter. A rerun of the installation seems can solve the issue (line 52). 
+**Note**: there might be errors when installing tractconverter. A rerun of the installation seems can solve the issue (e.g., ```pip install https://github.com/MarcCote/tractconverter/archive/master.zip```). 
 
 Append the following line to `.bashrc_sbci` (or the script file that's executed when a user logs in), so that the correct Python environment is running each time the pipeline is used.
 
