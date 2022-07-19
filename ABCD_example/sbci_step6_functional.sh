@@ -52,5 +52,5 @@ python ${SCRIPT_PATH}/concatenate_timeseries.py \
 python ${SCRIPT_PATH}/calculate_fc.py \
        --time_series ./dwi_pipeline/sbci_connectome/fc_ts.npz \
        --mesh ${OUTPUT_PATH}/mapping_avg_${RESOLUTION}.npz \
-       --output ./dwi_pipeline/sbci_connectome/fc_avg_${RESOLUTION}.mat -f
+       --output ./dwi_pipeline/sbci_connectome/fc_avg_${RESOLUTION}.mat --ts -f
 

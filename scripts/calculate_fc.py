@@ -4,7 +4,7 @@ import nibabel as nib
 import numpy as np
 import scipy.io as scio
 
-from os.path import isfile
+from os.path import isfile, splitext
 
 DESCRIPTION = """
   Calculate the functional connectivity (using Pearson Correlation) for the given mapping.
@@ -23,6 +23,9 @@ def _build_args_parser():
 
     p.add_argument('--output', action='store', metavar='OUTPUT', required=True,
                    type=str, help='Path of the .npz file to save the output to.')
+
+    p.add_argument('--ts', action='store_true', dest='ts',
+                   help='If set, also save mean BOLD signal to file.')
 
     p.add_argument('-f', action='store_true', dest='overwrite',
                    help='If set, overwrite files if they already exist.')
@@ -59,6 +62,15 @@ def main():
             logging.info('Overwriting "{0}".'.format(args.output))
         else:
             parser.error('The file "{0}" already exists. Use -f to overwrite it.'.format(args.output))
+
+    if args.ts == True:
+        ts_output = splitext(args.output)[0] + '_ts.mat'
+
+        if isfile(ts_output):
+            if args.overwrite:
+                logging.info('Overwriting "{0}".'.format(ts_output))
+            else:
+                parser.error('The file "{0}" already exists. Use -f to overwrite it.'.format(ts_output))
 
     # load mapping
     mesh = np.load(args.mesh, allow_pickle=True)
@@ -158,8 +170,13 @@ def main():
         scio.savemat(args.output, {'fc': result, 
                                    'sub_sub_fc': sub_sub_fc, 
                                    'sub_surf_fc': sub_surf_fc})
+        if args.ts == True:
+            scio.savemat(ts_output, {'cortical_ts': mean_time_series,
+                                     'subcortical_ts': sub_mean_time_series})
     else:
         scio.savemat(args.output, {'fc': result})
+        if args.ts == True:
+            scio.savemat(ts_output, {'cortical_ts': mean_time_series})
 
 
 if __name__ == "__main__":
