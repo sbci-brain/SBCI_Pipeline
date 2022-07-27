@@ -43,9 +43,11 @@ fi
 echo "Processing ${#subjects[@]} subject(s)"
 
 echo "Beginning processing of SBCI grid: $(date)"
+mkdir -p ${OUTPUT_PATH}
+
 STEP1=$(sb ${OPTIONS} --time=4:00:00 --mem=4g --job-name=$JID.step1 \
     --export=ALL,SBCI_CONFIG \
-    --output=sbci_step1_process_grid.log ${SCRIPTS}/sbci_step1_process_grid.sh)
+    --output=${OUTPUT_PATH}/sbci_step1_process_grid.log ${SCRIPTS}/sbci_step1_process_grid.sh)
 
 sleep 0.01
 

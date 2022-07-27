@@ -14,6 +14,9 @@ fi
 # CALCULATE FUNCTIONAL BOLD TIME SERIES AND CONNECTIVITY #
 ##########################################################
 
+# Create the output dir if not already there
+mkdir -p dwi_pipeline/sbci_connectome
+
 # If the subject has multiple BOLD runs, calculate FC for each of them (it is 
 # possible to concatenate BOLD time series instead of treating them individually)
 find ./fmri/bold/ -regextype sed -regex ".*/[0-9]\+$" -type d -print0 > ./dwi_pipeline/sbci_connectome/fcruns 
