@@ -24,9 +24,9 @@ for i in $(seq 1 ${#subjects[@]}); do
     cd ${DATA}/${subjects[$idx]}
 
     if [ ! -f "./dwi_pipeline/diffusion/fodf/fodf.nii.gz" ]; then
-	printf "${subjects[$idx]}\t FAILED\n" >> ${OUT}/qc_log
+	printf "${subjects[$idx]}\t FAILED\n" >> ${OUT}/preprocess_qc_log
     else
-	printf "${subjects[$idx]}\t COMPLETE\n" >> ${OUT}/qc_log
+	printf "${subjects[$idx]}\t COMPLETE\n" >> ${OUT}/preprocess_qc_log
 	#cd dwi_pipeline/structure
 	#mkdir -p ${OUT}/${subjects[$idx]}
 	#fsleyes render -of ${OUT}/${subjects[$idx]}/t1_parc.png -sortho t1_warped.nii.gz wmparc_warped_label.nii.gz 
