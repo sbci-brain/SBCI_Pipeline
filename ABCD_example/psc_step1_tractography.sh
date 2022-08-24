@@ -40,7 +40,7 @@ scil_remove_invalid_coordinates_from_streamlines.py --gnc --fnc \
 
 ########################### connectivity ###########################
 # get connectivity matrix
-mkdir psc_connectome
+mkdir -p psc_connectome
 cd psc_connectome
 
 ###### extract the streamline connectivity matrix for both cortical and subcortical 
