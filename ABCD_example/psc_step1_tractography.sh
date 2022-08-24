@@ -13,9 +13,9 @@ cd structure
 scil_compute_maps_for_particle_filter_tracking.py map_wm.nii.gz map_gm.nii.gz map_csf.nii.gz -t 0.05 --interface interface_005.nii.gz -f
 
 # dilation
-seeding_map_dilation.py interface_005.nii.gz map_wm.nii.gz map_gm.nii.gz map_csf.nii.gz --output_interface interface.nii.gz -t 0.05
-scil_count_non_zero_voxels.py interface.nii.gz -o interface_count.txt
-mv interface.nii.gz seeding_mask.nii.gz
+seeding_map_dilation.py interface_005.nii.gz map_wm.nii.gz map_gm.nii.gz map_csf.nii.gz --output_interface interface_psc.nii.gz -t 0.05
+scil_count_non_zero_voxels.py interface_psc.nii.gz -o interface_count.txt
+mv interface_psc.nii.gz seeding_mask.nii.gz
 
 cd ..
 

@@ -56,37 +56,41 @@ ROOT=$(pwd)
 for i in $(seq 1 ${#subjects[@]}); do
     idx=$((i - 1))
 
-    cd ${OUT}/${subjects[$idx]}
+    if [ -d "${OUT}/${subjects[$idx]}" ]; then
+        cd ${OUT}/${subjects[$idx]}
 
-    echo "Placing subject ${subjects[$idx]} in queue"
-    STEP2=$(sb ${OPTIONS} --time=20:00:00 --mem=20g --job-name=$JID.step2.${subjects[$idx]} \
-        --export=ALL,SBCI_CONFIG \
-        --output=sbci_step2_prepare_set.log \
-        --dependency=afterok:${STEP1} ${SCRIPTS}/sbci_step2_prepare_set.sh)
-
-    STEP3=()
-    for ((RUN = 1; RUN <= N_RUNS; RUN++)); do
-        STEP3+=($(sb ${OPTIONS} --time=40:00:00 --mem=20g --job-name=$JID.step3-4.${subjects[$idx]} \
+        echo "Placing subject ${subjects[$idx]} in queue"
+        STEP2=$(sb ${OPTIONS} --time=20:00:00 --mem=20g --job-name=$JID.step2.${subjects[$idx]} \
             --export=ALL,SBCI_CONFIG \
-            --output=sbci_step3_set_${RUN}.log \
-            --dependency=afterok:${STEP2} ${SCRIPTS}/sbci_step3_run_set.sh $RUN))
+            --output=sbci_step2_prepare_set.log \
+            --dependency=afterok:${STEP1} ${SCRIPTS}/sbci_step2_prepare_set.sh)
 
-    done
+        STEP3=()
+        for ((RUN = 1; RUN <= N_RUNS; RUN++)); do
+            STEP3+=($(sb ${OPTIONS} --time=40:00:00 --mem=20g --job-name=$JID.step3-4.${subjects[$idx]} \
+                --export=ALL,SBCI_CONFIG \
+                --output=sbci_step3_set_${RUN}.log \
+                --dependency=afterok:${STEP2} ${SCRIPTS}/sbci_step3_run_set.sh $RUN))
 
-    STEP4=$(sb ${OPTIONS} --time=4:00:00 --mem=4g --job-name=$JID.step3-4.${subjects[$idx]} \
-        --export=ALL,SBCI_CONFIG \
-        --output=sbci_step4_process_surfaces.log \
-        --dependency=singleton ${SCRIPTS}/sbci_step4_process_surfaces.sh)
+        done
 
-    STEP5=$(sb ${OPTIONS} --time=20:00:00 --mem=20g --job-name=$JID.step5.${subjects[$idx]} \
-        --export=ALL,SBCI_CONFIG \
-        --output=sbci_step5_structural.log \
-        --dependency=afterok:${STEP4} ${SCRIPTS}/sbci_step5_structural.sh)
+        STEP4=$(sb ${OPTIONS} --time=4:00:00 --mem=4g --job-name=$JID.step3-4.${subjects[$idx]} \
+            --export=ALL,SBCI_CONFIG \
+            --output=sbci_step4_process_surfaces.log \
+            --dependency=singleton ${SCRIPTS}/sbci_step4_process_surfaces.sh)
 
-    STEP6=$(sb ${OPTIONS} --time=10:00:00 --mem=20g --job-name=$JID.step6.${subjects[$idx]} \
-        --export=ALL,SBCI_CONFIG \
-        --output=sbci_step6_functional.log \
-        --dependency=afterok:${STEP1} ${SCRIPTS}/sbci_step6_functional.sh)
+        STEP5=$(sb ${OPTIONS} --time=20:00:00 --mem=20g --job-name=$JID.step5.${subjects[$idx]} \
+            --export=ALL,SBCI_CONFIG \
+            --output=sbci_step5_structural.log \
+            --dependency=afterok:${STEP4} ${SCRIPTS}/sbci_step5_structural.sh)
+
+        STEP6=$(sb ${OPTIONS} --time=10:00:00 --mem=20g --job-name=$JID.step6.${subjects[$idx]} \
+            --export=ALL,SBCI_CONFIG \
+            --output=sbci_step6_functional.log \
+            --dependency=afterok:${STEP1} ${SCRIPTS}/sbci_step6_functional.sh)
+    else
+        echo "ERROR: Subject not found: ${subjects[$idx]}" 
+    fi
 
     cd ${ROOT}
 done

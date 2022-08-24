@@ -4,19 +4,6 @@ IN=${1}
 OUT=${2}
 SCRIPTS=${3}
 
-# CHANGE LOCATION TO YOUR SOURCE FILE
-echo "Sourcing .bashrc"
-source ~/.bashrc-sbci
-
-# CHANGE LOCATION TO THE CONFIGURATION FILE FOR SBCI
-export SBCI_CONFIG=/nas/longleaf/home/mrcole/SBCI_Pipeline/abcd_pipeline/sbci_config
-
-# CHANGE FOR SPECIFIC SBATCH OPTIONS
-OPTIONS=""
-
-echo "Sourcing SBCI config file"
-source $SBCI_CONFIG
-
 echo $(which python)
 
 # helper function to return job id
@@ -40,20 +27,19 @@ if [[ ${#subjects[@]} -eq 0 ]]; then
     exit 1
 fi
 
-echo "Processing ${#subjects[@]} subject(s): ${JID}"
+echo "Clearing folders for ${#subjects[@]} subject(s): ${JID}"
 
 ROOT=$(pwd)
 
 for i in $(seq 1 ${#subjects[@]}); do
-    if [ -d "${OUT}/${subjects[$idx]}" ]; then
-        idx=$((i - 1))
+    idx=$((i - 1))
 
+    if [ -d "${OUT}/${subjects[$idx]}" ]; then
         cd ${OUT}/${subjects[$idx]}
 
         echo "Placing subject ${subjects[$idx]} in queue"
-        STEP1=$(sb $OPTIONS --time=48:00:00 --mem=15g --job-name=$JID.step1 \
-            --export=ALL,SBCI_CONFIG \
-            --output=psc_step1_tractography.log ${SCRIPTS}/psc_step1_tractography.sh)
+        STEP1=$(sb --time=1:00:00 --mem=2g --job-name=$JID.clean \
+            --output=postproc_clean_folders.log ${SCRIPTS}/postproc_clean_folders.sh)
     else
         echo "ERROR: Subject not found: ${subjects[$idx]}" 
     fi
