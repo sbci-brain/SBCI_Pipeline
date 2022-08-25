@@ -2,7 +2,7 @@
 
 echo "Cleaning the folder tree to reduce space"
 
-OUTPUTDIR=dwi_final_files
+OUTPUTDIR=psc_sbci_final_files
 
 echo "Begin copying files to ${OUTPUTDIR}"
 mkdir -p ${OUTPUTDIR}
