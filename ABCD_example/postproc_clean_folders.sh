@@ -79,7 +79,7 @@ mv dwi_pipeline/set/streamline/set_filtered_intersections.npz ${OUTPUTDIR}/set/s
 mkdir -p ${OUTPUTDIR}/sbci_connectome
 
 #FC
-mv dwi_pipeline/sbci_connectome/fc_ts.npz  ${OUTPUTDIR}/sbci_connectome/ #1.8GB
+# mv dwi_pipeline/sbci_connectome/fc_ts.npz  ${OUTPUTDIR}/sbci_connectome/ # too large to keep right now (1.8GB)
 mv dwi_pipeline/sbci_connectome/fc_avg_*.mat ${OUTPUTDIR}/sbci_connectome/
 mv dwi_pipeline/sbci_connectome/fc_avg_*_ts.mat ${OUTPUTDIR}/sbci_connectome/
 
