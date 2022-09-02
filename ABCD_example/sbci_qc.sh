@@ -17,20 +17,27 @@ echo "Checking ${#subjects[@]} subject(s)"
 
 rootdir=$(pwd)
 
-printf "Subject\t Status\n" > ${OUT}/sbci_qc_log
+printf "Subject\t SC Status\t FC Status\n" > ${OUT}/sbci_qc_log
 
 for i in $(seq 1 ${#subjects[@]}); do
     idx=$((i - 1))
     cd ${DATA}/${subjects[$idx]}
 
+    SCSTATUS="COMPLETE"
+    FCSTATUS="COMPLETE"
+
     if [ ! -f "./dwi_pipeline/sbci_connectome/smoothed_sc_avg_0.005_ico4.mat" ]; then
-	printf "${subjects[$idx]}\t FAILED\n" >> ${OUT}/sbci_qc_log
-    else
-	printf "${subjects[$idx]}\t COMPLETE\n" >> ${OUT}/sbcd_qc_log
-	#cd dwi_pipeline/structure
-	#mkdir -p ${OUT}/${subjects[$idx]}
-	#fsleyes render -of ${OUT}/${subjects[$idx]}/t1_parc.png -sortho t1_warped.nii.gz wmparc_warped_label.nii.gz 
+        SCSTATUS="FAILED"
     fi
+    if [ ! -f "./dwi_pipeline/sbci_connectome/fc_avg_ico4.mat" ]; then
+        FCSTATUS="FAILED" 
+    fi
+
+    #cd dwi_pipeline/structure
+    #mkdir -p ${OUT}/${subjects[$idx]}
+    #fsleyes render -of ${OUT}/${subjects[$idx]}/t1_parc.png -sortho t1_warped.nii.gz wmparc_warped_label.nii.gz 
+
+    printf "${subjects[$idx]}\t ${SCSTATUS}\t ${FCSTATUS}\n" >> ${rootdir}/${OUT}/sbci_qc_log
 
     cd ${rootdir}
 done
