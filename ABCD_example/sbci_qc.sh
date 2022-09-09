@@ -37,7 +37,7 @@ for i in $(seq 1 ${#subjects[@]}); do
     #mkdir -p ${OUT}/${subjects[$idx]}
     #fsleyes render -of ${OUT}/${subjects[$idx]}/t1_parc.png -sortho t1_warped.nii.gz wmparc_warped_label.nii.gz 
 
-    printf "${subjects[$idx]}\t ${SCSTATUS}\t ${FCSTATUS}\n" >> ${rootdir}/${OUT}/sbci_qc_log
+    printf "${subjects[$idx]}\t ${SCSTATUS}\t ${FCSTATUS}\n" >> ${OUT}/sbci_qc_log
 
     cd ${rootdir}
 done
