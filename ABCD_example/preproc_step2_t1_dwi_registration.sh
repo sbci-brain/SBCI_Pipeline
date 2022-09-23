@@ -86,7 +86,7 @@ scil_resample_volume.py diffusion/b0_mask_cropped.nii.gz \
 
 mrcalc diffusion/dwi_resample_clipped.nii.gz \
 	diffusion/mask_resample.nii.gz \
-        -mult diffusion/dwi_resampled.nii.gz -quiet
+        -mult diffusion/dwi_resampled.nii.gz -quiet -force
 
 # resample b0
 scil_extract_b0.py diffusion/dwi_resampled.nii.gz \
@@ -95,7 +95,7 @@ scil_extract_b0.py diffusion/dwi_resampled.nii.gz \
 	diffusion/b0_resampled.nii.gz \
 	--mean --b0_thr 10
 
-mrthreshold diffusion/b0_resampled.nii.gz diffusion/b0_mask_resampled.nii.gz --abs 0.00001
+mrthreshold diffusion/b0_resampled.nii.gz diffusion/b0_mask_resampled.nii.gz --abs 0.00001 -force
 
 
 ################################################################### 

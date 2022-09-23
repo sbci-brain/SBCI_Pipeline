@@ -8,6 +8,11 @@ cd structure
 
 export SUBJECTS_DIR=$(pwd)
 
+# make sure we have a clean folder to work with
+if [ -d "./t1_freesurfer" ]; then
+  rm -r t1_freesurfer
+fi
+
 # t1 image name is T1_dti_final, should be in the "structure" folder
 recon-all -subjid t1_freesurfer -i t1_wholebrain_warped.nii.gz -all
 
