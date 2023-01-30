@@ -7,12 +7,12 @@ echo "Sourcing FREESURFER_HOME"
 source ${FREESURFER_PATH}/SetUpFreeSurfer.sh
 
 echo "Begin FSFast fMRI preprocessing: $(date)"
-export SUBJECTS_DIR=$(pwd)/dwi_sbci_connectome/structure
+export SUBJECTS_DIR=$(pwd)/dwi_pipeline/structure
 
 cd fsfast
 echo t1_freesurfer > subjectname
 
-SUBJECT_ID=.
+SUBJECT_ID=t1_freesurfer
 
 # preprocess the BOLD time series for each run separately
 preproc-sess -s ${SUBJECT_ID} -fwhm 5 -stc siemens -surface fsaverage lhrh -per-run -fsd bold -mni305 -force
