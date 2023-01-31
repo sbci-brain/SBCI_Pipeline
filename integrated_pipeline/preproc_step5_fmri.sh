@@ -53,7 +53,7 @@ mkanalysis-sess -analysis fc.surface.lh \
     -mcextreg \
     -polyfit 1 \
     -fsd bold \
-    -TR 2.5 \
+    -TR 0.72 \
     -stc siemens \
     -hpf 0.009 \
     -lpf 0.08 \
@@ -71,7 +71,7 @@ mkanalysis-sess -analysis fc.surface.rh \
     -mcextreg \
     -polyfit 1 \
     -fsd bold \
-    -TR 2.5 \
+    -TR 0.72 \
     -stc siemens \
     -hpf 0.009 \
     -lpf 0.08 \
@@ -89,7 +89,7 @@ mkanalysis-sess -analysis fc.mni \
     -mcextreg \
     -polyfit 1 \
     -fsd bold \
-    -TR 2.5 \
+    -TR 0.72 \
     -stc siemens \
     -hpf 0.009 \
     -lpf 0.08 \
@@ -104,13 +104,13 @@ selxavg3-sess -analysis fc.mni -s ${SUBJECT_ID} -no-con-ok -run-wise -svres -for
 # find the separate runs and move the final BOLD timeseries' to their own folders
 cd ..
 
-find ./fsfast/bold/ -regextype sed -regex ".*/[0-9]\+$" -type d -printf "%f\n" > ./fcruns
+find ./fsfast/${SUBJECT_ID}/bold/ -regextype sed -regex ".*/[0-9]\+$" -type d -printf "%f\n" > ./fcruns
 
 while read BOLDRUN; do
-  mkdir -p fmri/bold/${BOLDRUN}
-  mv ./fsfast/bold/fc.surface.lh/pr${BOLDRUN}/res/res-${BOLDRUN}.nii.gz ./fmri/bold/${BOLDRUN}/fc.surface.lh.nii.gz
-  mv ./fsfast/bold/fc.surface.rh/pr${BOLDRUN}/res/res-${BOLDRUN}.nii.gz ./fmri/bold/${BOLDRUN}/fc.surface.rh.nii.gz
-  mv ./fsfast/bold/fc.mni/pr${BOLDRUN}/res/res-${BOLDRUN}.nii.gz ./fmri/bold/${BOLDRUN}/fc.mni.nii.gz
+  mkdir -p fmri/${SUBJECT_ID}/bold/${BOLDRUN}
+  mv ./fsfast/${SUBJECT_ID}/bold/fc.surface.lh/pr${BOLDRUN}/res/res-${BOLDRUN}.nii.gz ./fmri/${SUBJECT_ID}/bold/${BOLDRUN}/fc.surface.lh.nii.gz
+  mv ./fsfast/${SUBJECT_ID}/bold/fc.surface.rh/pr${BOLDRUN}/res/res-${BOLDRUN}.nii.gz ./fmri/${SUBJECT_ID}/bold/${BOLDRUN}/fc.surface.rh.nii.gz
+  mv ./fsfast/${SUBJECT_ID}/bold/fc.mni/pr${BOLDRUN}/res/res-${BOLDRUN}.nii.gz ./fmri/${SUBJECT_ID}/bold/${BOLDRUN}/fc.mni.nii.gz
 done < ./fcruns
 
 echo "Finished FSFast fMRI preprocessing: $(date)"

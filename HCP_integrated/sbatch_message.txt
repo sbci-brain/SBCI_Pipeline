@@ -1,11 +1,5 @@
 Sourcing SBCI config file
-Processing 1 subject(s): 29d99a2b
+Processing 1 subject(s): c9e92670
 Placing subject 103818
-sbatch: mem < mem-per-cpu - resizing mem to be equal to mem-per-cpu
-submit step1
-afterok:14467338 /home/ywang330/SBCI_Pipeline/integrated_pipeline
-submit step2
-submit step3
-submit step4
 sbatch: mem < mem-per-cpu - resizing mem to be equal to mem-per-cpu
 done

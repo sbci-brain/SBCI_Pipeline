@@ -130,7 +130,7 @@ for i in $(seq 1 ${#subjects[@]}); do
             --export=ALL,SBCI_CONFIG \
             --output=preproc_step5_fmri.log \
             --dependency=afterok:${STEP3} ${SCRIPTS}/preproc_step5_fmri.sh)
-
+    echo "submit step5"
     cd ${ROOTDIR} 
     # preprocess functional data
 done
