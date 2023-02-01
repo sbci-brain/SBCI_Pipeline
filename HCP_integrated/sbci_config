@@ -23,6 +23,8 @@ FODF_BVALS=(0 1000 2000)
 SCRIPT_PATH=/home/ywang330/SBCI_Pipeline/scripts
 CONCON_PATH=/home/ywang330/SBCI_Pipeline/concon
 
+REFDIR=/scratch/tbaran2_lab/sbci_integrated/subjects_dir/103818/dwi_pipeline/structure/fsaverage
+
 PSC_PATH=/home/ywang330/PSC_Pipeline/
 SBCI_PATH=/home/ywang330/SBCI_Pipeline/
 FREESURFER_PATH=/software/freesurfer/6.0.0/
