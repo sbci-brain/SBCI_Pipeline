@@ -1,5 +1,4 @@
 Sourcing SBCI config file
-Processing 1 subject(s): c9e92670
-Placing subject 103818
-sbatch: mem < mem-per-cpu - resizing mem to be equal to mem-per-cpu
-done
+Processing 1 subject(s): 9c31d180
+Placing subject 103818 in queue
+Beginning processing of SBCI grid: Wed Feb  1 03:41:46 EST 2023

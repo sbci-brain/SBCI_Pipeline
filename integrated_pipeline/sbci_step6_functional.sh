@@ -12,13 +12,13 @@ fi
 
 # If the subject has multiple BOLD runs, calculate FC for each of them (it is 
 # possible to concatenate BOLD time series instead of treating them individually)
-find ./fmri/bold/ -regextype sed -regex ".*/[0-9]\+$" -type d -print0 > ./dwi_sbci_connectome/SBCI/fcruns 
+find ./fmri/t1_freesurfer/bold/ -regextype sed -regex ".*/[0-9]\+$" -type d -print0 > ./dwi_pipeline/sbci_connectome/fcruns 
 
 run=1
 
 while IFS= read -r -d '' FCDIR; do
 
-  FCOUTPUTDIR=./dwi_sbci_connectome/sbci_connectome/RUN$(printf '%03d' $run)
+  FCOUTPUTDIR=./dwi_pipeline/sbci_connectome/RUN$(printf '%03d' $run)
 
   mkdir -p ${FCOUTPUTDIR}
 
@@ -39,5 +39,5 @@ while IFS= read -r -d '' FCDIR; do
 
   run=$((run + 1))
 
-done < ./dwi_sbci_connectome/SBCI/fcruns
+done < ./dwi_pipeline/sbci_connectome/fcruns
 

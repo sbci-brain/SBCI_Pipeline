@@ -20,6 +20,9 @@ FODF_BVALS=(0 1000 2000)
 # Change these to point to your local installation of SBCI
 ###########################################################################################
 
+SCRIPT_PATH=/home/ywang330/SBCI_Pipeline/scripts
+CONCON_PATH=/home/ywang330/SBCI_Pipeline/concon
+
 PSC_PATH=/home/ywang330/PSC_Pipeline/
 SBCI_PATH=/home/ywang330/SBCI_Pipeline/
 FREESURFER_PATH=/software/freesurfer/6.0.0/
