@@ -4,17 +4,17 @@ echo "Begin preparing data: $(date)"
 
 # flip T1
 cd anat
-mrconvert *_T1w.nii.gz -stride 1,2,3 t1.nii.gz -force
+mrconvert *_T1w.nii* -stride 1,2,3 t1.nii.gz -force
 cd ..
 
 # flip dMRI
 cd dwi
-run_count=$(ls -f *[0-9]_dwi.nii.gz | wc -l)
+run_count=$(ls -f *[0-9]_dwi.nii* | wc -l)
 
 # some subjects have multiple runs (if so, merge them into one)
 if [ ${run_count} -gt 1 ]; then
     # combine dwi image files
-    fslmerge -t dwi_all *[0-9]_dwi.nii.gz
+    fslmerge -t dwi_all *[0-9]_dwi.nii*
 
     # combine b-value files
     for f in $(ls *[0-9]_dwi.bval); do 
@@ -37,11 +37,11 @@ if [ ${run_count} -gt 1 ]; then
     echo $(cat bvecs_2) >> bvec_all.bvec
     echo $(cat bvecs_3) >> bvec_all.bvec
 
-    mrconvert dwi_all.nii.gz -stride 1,2,3,4 flipped_data.nii.gz -force
+    mrconvert dwi_all.nii* -stride 1,2,3,4 flipped_data.nii.gz -force
     scil_convert_gradient_fsl_to_mrtrix.py bval_all.bval bvec_all.bvec encoding.b  -f
 
     # remove intermediate files
-    rm -rf dwi_all.nii.gz
+    rm -rf dwi_all.nii*
     rm -rf bval_all.bval
     rm -rf bvec_all.bvec
     rm -rf bvecs_1 bvecs_2 bvecs_3
@@ -49,7 +49,7 @@ fi
 
 # if only one subject, skip all the merging steps
 if [ ${run_count} -eq 1 ]; then
-    mrconvert *_dwi.nii.gz -stride 1,2,3,4 flipped_data.nii.gz -force
+    mrconvert *_dwi.nii* -stride 1,2,3,4 flipped_data.nii.gz -force
     scil_convert_gradient_fsl_to_mrtrix.py *_dwi.bval *_dwi.bvec encoding.b  -f
 fi
 
