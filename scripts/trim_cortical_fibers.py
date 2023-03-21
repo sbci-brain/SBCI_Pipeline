@@ -10,7 +10,6 @@ from os.path import isfile
 from collections import namedtuple, Counter
 from dipy.tracking import metrics
 from dipy.tracking.streamline import length, set_number_of_points, compress_streamlines
-from scilpy.io.vtk_streamlines import load_vtk_streamlines, save_vtk_streamlines
 
 import scilpy.surface.intersection as stools
 
@@ -21,7 +20,7 @@ DESCRIPTION = """
 
 # constants 
 DEPTH_THR = 2
-SAMPLE_SIZE = 0.2
+SAMPLE_SIZE = 0.1
 COMPRESSION_RATE = 0.2
 
 # somewhere to store generated streamlines and their intersections
@@ -70,7 +69,7 @@ class ROI_Streamlines(
 
     # save all the current streamlines
     def save_streamlines(self, filename):
-        save_vtk_streamlines(self.streamlines, filename, binary = True)
+        save_vtk_streamlines(filename, self.streamlines)
     
 
 def _build_args_parser():
@@ -116,6 +115,74 @@ def load_vtk(filename):
     return reader.GetOutput()
 
 
+def load_vtk_streamlines(filename):
+    reader = vtk.vtkPolyDataReader()
+    reader.SetFileName(filename)
+    reader.Update()
+    polydata = reader.GetOutput()
+
+    lines_vertices = ns.vtk_to_numpy(polydata.GetPoints().GetData())
+    lines_idx = ns.vtk_to_numpy(polydata.GetLines().GetData())
+
+    lines = []
+    current_idx = 0
+
+    while current_idx < len(lines_idx):
+        line_len = lines_idx[current_idx]
+
+        next_idx = current_idx + line_len + 1
+        line_range = lines_idx[current_idx + 1: next_idx]
+
+        lines += [lines_vertices[line_range]]
+        current_idx = next_idx
+
+    return lines
+
+
+def save_vtk_streamlines(filename, streamlines):
+    points_array = np.vstack(streamlines).astype(np.float32)
+
+    nb_lines = len(streamlines)
+    nb_points = len(points_array)
+    lines_range = range(nb_lines)
+
+    # Get lines_array in vtk input format
+    lines_array = []
+    points_per_line = np.zeros([nb_lines], dtype=np.int32)
+    current_position = 0
+
+    for i in range(nb_lines):
+        current_len = len(streamlines[i])
+        points_per_line[i] = current_len
+
+        end_position = current_position + current_len
+        lines_array += [current_len]
+        lines_array += range(current_position, end_position)
+        current_position = end_position
+
+    # Set Points to vtk array format
+    vtk_points = vtk.vtkPoints()
+    vtk_points.SetData(ns.numpy_to_vtk(np.asarray(points_array), deep=True, array_type=vtk.VTK_FLOAT))
+
+    # Set Lines to vtk array format
+    lines_array = ns.numpy_to_vtk(lines_array, array_type=vtk.VTK_INT)
+    vtk_lines = vtk.vtkCellArray()
+    vtk_lines.SetNumberOfCells(nb_lines)
+    vtk_lines.GetData().DeepCopy(lines_array)
+
+    # Create the poly_data
+    poly_data = vtk.vtkPolyData()
+    poly_data.SetPoints(vtk_points)
+    poly_data.SetLines(vtk_lines)
+    
+    writer = vtk.vtkPolyDataWriter()
+    writer.SetFileName(filename)
+    writer.SetInputData(poly_data)
+    writer.SetFileTypeToBinary()
+    writer.Update()
+    writer.Write()
+
+
 # trim streamlines to be within the cortical surface, splitting if needed
 def trim_cortical_streamline(streamline, sl_id, locator, surface_mask, surface_type):
     # loop variables
@@ -125,8 +192,8 @@ def trim_cortical_streamline(streamline, sl_id, locator, surface_mask, surface_t
 
     # find all points that the streamline intersects with any of the surfaces
     for j in range(0, n - 1):
-        pt1 = streamline[j] * [-1, -1, 1]
-        pt2 = streamline[j+1] * [-1, -1, 1]
+        pt1 = streamline[j]
+        pt2 = streamline[j+1]
 
         result = stools.seg_intersect_trees2(pt1, pt2, locator, 
                                              sl_id, j, 
@@ -155,6 +222,9 @@ def trim_cortical_streamline(streamline, sl_id, locator, surface_mask, surface_t
 
     ids_in = []
     ids_out = []
+    surf_in = []
+    surf_out = []
+
     new_streamlines = []
 
     # loop through each line segment and check for 
@@ -162,8 +232,6 @@ def trim_cortical_streamline(streamline, sl_id, locator, surface_mask, surface_t
     for interval in intervals:
         first_in = None
         last_out = None
-        first_id = None
-        last_id = None
 
         for j in range(interval[0], interval[1]):
             interception = interceptions[j]
@@ -172,17 +240,13 @@ def trim_cortical_streamline(streamline, sl_id, locator, surface_mask, surface_t
                 if interception.is_going_in == True:
                     if first_in is None:
                         first_in = j
-                        first_id = interception.triangle_index
                 elif first_in is not None:
                     last_out = j
-                    last_id = interception.triangle_index
             elif interception.surface_type == stools.Surface_type.INNER:
                 if first_in is None:
                     first_in = j
-                    first_id = None
                 else:
                     last_out = j
-                    last_id = None
         
         if first_in is None:
             first_in = interval[0]
@@ -193,20 +257,33 @@ def trim_cortical_streamline(streamline, sl_id, locator, surface_mask, surface_t
         inter_out = interceptions[last_out]
         new_streamline = streamline[inter_in.segment_index:inter_out.segment_index + 1]
 
-        new_streamline[0, :] = inter_in.point * np.array([-1,-1,1])
-        new_streamline[-1, :] = inter_out.point * np.array([-1,-1,1])
+        new_streamline[0, :] = inter_in.point
+        new_streamline[-1, :] = inter_out.point
             
         new_streamlines.append(new_streamline)
-        ids_in.append(first_id)
-        ids_out.append(last_id)
+
+        if inter_in.surface_type == stools.Surface_type.BASE:
+            ids_in.append(inter_in.triangle_index)
+        else:
+            ids_in.append(None)
+
+        if inter_out.surface_type == stools.Surface_type.BASE:
+            ids_out.append(inter_out.triangle_index)
+        else:
+            ids_out.append(None)
+
+        surf_in.append(inter_in.surface_type)
+        surf_out.append(inter_out.surface_type)
 
     # if no intersections found, save whole streamline
     if not intervals:
         new_streamlines.append(streamline)
         ids_in.append(None)
         ids_out.append(None)
+        surf_in.append(None)
+        surf_out.append(None)
 
-    return new_streamlines, ids_in, ids_out
+    return new_streamlines, ids_in, ids_out, surf_in, surf_out
 
 
 # split streamlines into #ROIs choose 2 fibers and filter out non-intersecting tracts 
@@ -224,7 +301,7 @@ def split_subcortical_streamline(streamline, label_data, rois, tri_in, tri_out):
     n_subcortical = np.sum(np.isin(rois, np.unique(label_data)))
 
     # check if the streamline intersects with the cortical surface
-    n_cortical = np.count_nonzero([tri_in, tri_out])
+    n_cortical = (tri_in is not None) + (tri_out is not None)
 
     # if just cortical to cortical, return whole streamline
     if n_subcortical == 0 and n_cortical == 2:
@@ -467,7 +544,7 @@ def main():
             continue
 
         # trim and split cortical intersections
-        trimmed_streamlines, tri_in, tri_out = trim_cortical_streamline(streamlines[i], i, locator, surface_mask, surface_map)
+        trimmed_streamlines, tri_in, tri_out, surf_in, surf_out = trim_cortical_streamline(streamlines[i], i, locator, surface_mask, surface_map)
 
         # split subcortical intersections
         for j in range(len(trimmed_streamlines)):
@@ -476,6 +553,7 @@ def main():
             fiber_len = length(trimmed_streamlines[j])
             n_points = int(fiber_len / SAMPLE_SIZE)
  
+            # filter out small fibers
             if n_points < 3:
                continue
 

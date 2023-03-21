@@ -32,6 +32,7 @@ mv dwi_pipeline/structure/map_gm.nii.gz ${OUTPUTDIR}/structure/
 mv dwi_pipeline/structure/map_csf.nii.gz ${OUTPUTDIR}/structure/
 mv dwi_pipeline/structure/interface.nii.gz ${OUTPUTDIR}/structure/
 mv dwi_pipeline/structure/seeding_mask.nii.gz ${OUTPUTDIR}/structure/
+mv dwi_pipeline/structure/aparc.a2009s+aseg_warped_label.nii.gz ${OUTPUTDIR}/structure/
 
 #let's now handle the "diffusion" folder; keep about 1.3 GB data
 #------------------------------------------------------------------------

@@ -41,12 +41,12 @@ scil_flip_surface.py ${OUTPUTDIR}/rh_sphere_reg.vtk ${OUTPUTDIR}/rh_sphere_reg_l
 # normalize spherical meshes to have radius 1
 python ${SCRIPT_PATH}/normalise_vtk.py \
        --surface ${OUTPUTDIR}/lh_sphere_reg_lps.vtk \
-       --output ${OUTPUTDIR}/lh_sphere_reg_lps_norm.vtk -f
+       --output ${OUTPUTDIR}/lh_sphere_reg_norm.vtk -f
 
 python ${SCRIPT_PATH}/normalise_vtk.py \
        --surface ${OUTPUTDIR}/rh_sphere_reg_lps.vtk \
-       --output ${OUTPUTDIR}/rh_sphere_reg_lps_norm.vtk -f
+       --output ${OUTPUTDIR}/rh_sphere_reg_norm.vtk -f
 
-python ${SCRIPT_PATH}/get_coords.py --lh_surface ${OUTPUTDIR}/lh_sphere_reg_lps_norm.vtk --rh_surface ${OUTPUTDIR}/rh_sphere_reg_lps_norm.vtk --output ${OUTPUTDIR}/subject_coords.npz -f
+python ${SCRIPT_PATH}/get_coords.py --lh_surface ${OUTPUTDIR}/lh_sphere_reg_norm.vtk --rh_surface ${OUTPUTDIR}/rh_sphere_reg_norm.vtk --output ${OUTPUTDIR}/subject_coords.npz -f
 
 echo "Finished processing SBCI surfaces: $(date)"

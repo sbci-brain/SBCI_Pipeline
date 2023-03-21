@@ -82,4 +82,19 @@ python ${SCRIPT_PATH}/calculate_subcortical_sc.py \
        --bandwidth ${BANDWIDTH} \
        --output ${OUTPUTDIR}/sub_sc_avg_${BANDWIDTH}_${RESOLUTION}.mat -f
 
+# Step4) Calculate fiber endpoints
+python ${SCRIPT_PATH}/intersections_to_sphere.py \
+  --lh_reg_surface ${OUTPUTDIR}/lh_sphere_reg_norm.vtk \
+  --rh_reg_surface ${OUTPUTDIR}/rh_sphere_reg_norm.vtk \
+  --set_surfaces ${SETDIR}/out_surf/surfaces.vtk \
+  --set_surface_map ${SETDIR}/preprocess/surfaces_id.npy \
+  --intersections ${SETDIR}/streamline/set_filtered_intersections.npz \
+  --output ${OUTPUTDIR}/sphere_intersections.npz -f
+
+python ${SCRIPT_PATH}/get_fibers_barycentric.py \
+  --lh_surface ${OUTPUT_PATH}/lh_grid_avg_${RESOLUTION}.vtk \
+  --rh_surface ${OUTPUT_PATH}/rh_grid_avg_${RESOLUTION}.vtk \
+  --intersections ${OUTPUTDIR}/sphere_intersections.npz \
+  --output ${OUTPUTDIR}/mesh_intersections_${RESOLUTION}.mat -f
+
 echo "Finished processing SBCI structural: $(date)"

@@ -48,10 +48,10 @@ mris_convert --to-scanner set/preprocess/rh.white set/preprocess/rh.white.vtk
 
 # flip from RAS (Right-Anterior-Superior, the standard coordinate system for freesurfer output) to
 # LPS (Left-Posterior-Superior), the standard for SET (because it makes more sense with MI-Brain).
-scil_flip_surface.py set/preprocess/lh.pial.vtk set/preprocess/lh_pial_lps.vtk -x -y
-scil_flip_surface.py set/preprocess/rh.pial.vtk set/preprocess/rh_pial_lps.vtk -x -y
-scil_flip_surface.py set/preprocess/lh.white.vtk set/preprocess/lh_white_lps.vtk -x -y
-scil_flip_surface.py set/preprocess/rh.white.vtk set/preprocess/rh_white_lps.vtk -x -y
+scil_flip_surface.py set/preprocess/lh.pial.vtk set/preprocess/lh_pial_lps.vtk -x -y -f
+scil_flip_surface.py set/preprocess/rh.pial.vtk set/preprocess/rh_pial_lps.vtk -x -y -f
+scil_flip_surface.py set/preprocess/lh.white.vtk set/preprocess/lh_white_lps.vtk -x -y -f
+scil_flip_surface.py set/preprocess/rh.white.vtk set/preprocess/rh_white_lps.vtk -x -y -f
 
 #surface for surface labels; (check this, maybe use xl_white.vkt); confirmed with ET, it's okay to use either surfaces.
 scil_surface.py set/preprocess/lh_white_lps.vtk --annot set/preprocess/lh.aparc.a2009s.annot --save_vts_label  set/preprocess/lh_labels.npy -f
@@ -86,16 +86,24 @@ for ROI in ${ROIS[*]}; do
 		--vts_val 0.0 \
 		--save_vts_mask set/preprocess/${NAME}_flow_mask.npy -f
 
-  # streamline can stop any part in this ROI
+  # do not seed on the cerebelum or brainstem
+  if [[ ${ROI} == 8 ]] || [[ ${ROI} == 47 ]] || [[ ${ROI} == 16 ]]; then
+      # do not seed on this surface
+      scil_surface.py set/preprocess/roi_${NAME}.vtk \
+	      --vts_val 0.0 \
+              --save_vts_mask set/preprocess/${NAME}_seed_mask.npy -f
+  else
+      # at each vertices check fa value and binarise 0 if < 0.15, 1 otherwise
+      scil_surface_map_from_volume.py set/preprocess/roi_${NAME}.vtk \
+	      diffusion/dti/fa.nii.gz \
+              set/preprocess/${NAME}_seed_mask.npy \
+              --binarize --binarize_value 0.15 -f
+  fi
+
+  # streamline can stop at any point within this ROI
   scil_surface.py set/preprocess/roi_${NAME}.vtk \
-		--vts_val 1.0 \
-		--save_vts_mask set/preprocess/${NAME}_intersections_mask.npy -f
-  
-  # at each vertices check fa value and binarise 0 if < 0.15, 1 otherwise
-  scil_surface_map_from_volume.py set/preprocess/roi_${NAME}.vtk \
-		diffusion/dti/fa.nii.gz \
-                set/preprocess/${NAME}_seed_mask.npy \
-		--binarize --binarize_value 0.15 -f
+	  --vts_val 1.0 \
+          --save_vts_mask set/preprocess/${NAME}_intersections_mask.npy -f
 
   ROI_SURFACES="$ROI_SURFACES set/preprocess/roi_${NAME}.vtk"
   ROI_FLOW_MASKS="$ROI_FLOW_MASKS set/preprocess/${NAME}_flow_mask.npy"
@@ -103,30 +111,29 @@ for ROI in ${ROIS[*]}; do
   ROI_SEED_MASKS="$ROI_SEED_MASKS set/preprocess/${NAME}_seed_mask.npy"
 done
 
-
 # surf mask for masks_for_concatenate for surface flow
 # some ROIs [6 7 8 9 10 35 42 67] were removed 
-scil_surface.py set/preprocess/lh.white.vtk --annot set/preprocess/lh.aparc.a2009s.annot \
+scil_surface.py set/preprocess/lh_white_lps.vtk --annot set/preprocess/lh.aparc.a2009s.annot \
         -i -1 0 6 7 8 9 10 35 42 67 --inverse_mask \
         --save_vts_mask set/preprocess/lh_flow_mask.npy -f
 
-scil_surface.py set/preprocess/rh.white.vtk --annot set/preprocess/rh.aparc.a2009s.annot \
+scil_surface.py set/preprocess/rh_white_lps.vtk --annot set/preprocess/rh.aparc.a2009s.annot \
         -i -1 0 6 7 8 9 10 35 42 67 --inverse_mask \
         --save_vts_mask set/preprocess/rh_flow_mask.npy -f
 
-scil_surface.py set/preprocess/lh.white.vtk --annot set/preprocess/lh.aparc.a2009s.annot \
+scil_surface.py set/preprocess/lh_white_lps.vtk --annot set/preprocess/lh.aparc.a2009s.annot \
         -i -1 0 --inverse_mask \
         --save_vts_mask set/preprocess/lh_seed_mask.npy -f
 
-scil_surface.py set/preprocess/rh.white.vtk --annot set/preprocess/rh.aparc.a2009s.annot\
+scil_surface.py set/preprocess/rh_white_lps.vtk --annot set/preprocess/rh.aparc.a2009s.annot\
         -i -1 0 --inverse_mask \
         --save_vts_mask set/preprocess/rh_seed_mask.npy -f
 
-scil_surface.py set/preprocess/lh.white.vtk --annot set/preprocess/lh.aparc.a2009s.annot \
+scil_surface.py set/preprocess/lh_white_lps.vtk --annot set/preprocess/lh.aparc.a2009s.annot \
         -i -1 0 --inverse_mask \
         --save_vts_mask set/preprocess/lh_intersections_mask.npy -f
 
-scil_surface.py set/preprocess/rh.white.vtk --annot set/preprocess/rh.aparc.a2009s.annot \
+scil_surface.py set/preprocess/rh_white_lps.vtk --annot set/preprocess/rh.aparc.a2009s.annot \
         -i -1 0 --inverse_mask \
         --save_vts_mask set/preprocess/rh_intersections_mask.npy -f
 
@@ -196,6 +203,17 @@ scil_surface_seed_map.py set/out_surf/surfaces.vtk set/out_surf/seeding_map_0.np
         --vts_mask set/out_surf/seed_mask.npy \
         --triangle_area_weighting -f
 
+cd structure
+
+# compute pft maps (include, exclude, interface are outputs)
+scil_compute_maps_for_particle_filter_tracking.py map_wm.nii.gz \
+	map_gm.nii.gz \
+	map_csf.nii.gz \
+	--include set_map_include.nii.gz \
+	--exclude set_map_exclude.nii.gz \
+	--interface set_interface.nii.gz -f
+
+cd ..
 cd ..
 
 echo "Finished processing SET preparation: $(date)"

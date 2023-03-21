@@ -31,24 +31,16 @@ scil_flip_surface.py ${OUTPUT_PATH}/rh_white_avg.vtk ${OUTPUT_PATH}/rh_white_avg
 scil_flip_surface.py ${OUTPUT_PATH}/lh_inflated_avg.vtk ${OUTPUT_PATH}/lh_inflated_avg_lps.vtk -x -y -f
 scil_flip_surface.py ${OUTPUT_PATH}/rh_inflated_avg.vtk ${OUTPUT_PATH}/rh_inflated_avg_lps.vtk -x -y -f
 
-## Step1) Sample from the white matter mesh to the required resolution
-
-python ${SCRIPT_PATH}/sample_ico_surface.py \
-       --output ${OUTPUT_PATH}/grid_ids_${RESOLUTION}.npz \
-       --resolution ${RESOLUTION} -f
-
-# Step2) Downsample the white sphere mesh to the required resolution
-python ${SCRIPT_PATH}/generate_sphere.py \
-       --surface ${OUTPUT_PATH}/lh_sphere_avg_lps.vtk \
-       --points ${OUTPUT_PATH}/grid_ids_${RESOLUTION}.npz \
+# Step1) Downsample the sphere surfaces to the given resolution
+python ${SCRIPT_PATH}/downsample_ico_mesh.py \
+       --surface ${OUTPUT_PATH}/lh_sphere_avg_lps.vtk --res ${RESOLUTION} \
        --output ${OUTPUT_PATH}/lh_sphere_avg_${RESOLUTION}.vtk -f
 
-python ${SCRIPT_PATH}/generate_sphere.py \
-       --surface ${OUTPUT_PATH}/rh_sphere_avg_lps.vtk \
-       --points ${OUTPUT_PATH}/grid_ids_${RESOLUTION}.npz \
+python ${SCRIPT_PATH}/downsample_ico_mesh.py \
+       --surface ${OUTPUT_PATH}/rh_sphere_avg_lps.vtk --res ${RESOLUTION} \
        --output ${OUTPUT_PATH}/rh_sphere_avg_${RESOLUTION}.vtk -f
 
-# Step3) Generate a discrete mapping from the full resolution mesh to the downsampled mesh
+# Step2) Generate a discrete mapping from the full resolution mesh to the downsampled mesh
 python ${SCRIPT_PATH}/map_surfaces.py \
        --lh_surface_hi ${OUTPUT_PATH}/lh_sphere_avg_lps.vtk \
        --lh_surface_lo ${OUTPUT_PATH}/lh_sphere_avg_${RESOLUTION}.vtk \
@@ -57,18 +49,22 @@ python ${SCRIPT_PATH}/map_surfaces.py \
        --matlab_output ${OUTPUT_PATH}/mapping_avg_${RESOLUTION}.mat \
        --output ${OUTPUT_PATH}/mapping_avg_${RESOLUTION}.npz -f
 
-# Step4) Generate meshes for visualisation
-python ${SCRIPT_PATH}/downsample_mesh.py \
-       --lh_surface ${OUTPUT_PATH}/lh_white_avg_lps.vtk \
-       --rh_surface ${OUTPUT_PATH}/rh_white_avg_lps.vtk \
-       --mesh ${OUTPUT_PATH}/mapping_avg_${RESOLUTION}.npz \
-       --suffix _${RESOLUTION} -f
+# Step3) Generate meshes for visualisation
+python ${SCRIPT_PATH}/downsample_ico_mesh.py \
+       --surface ${OUTPUT_PATH}/lh_white_avg_lps.vtk --res ${RESOLUTION} \
+       --output ${OUTPUT_PATH}/lh_white_avg_${RESOLUTION}.vtk -f
 
-python ${SCRIPT_PATH}/downsample_mesh.py \
-       --lh_surface ${OUTPUT_PATH}/lh_inflated_avg_lps.vtk \
-       --rh_surface ${OUTPUT_PATH}/rh_inflated_avg_lps.vtk \
-       --mesh ${OUTPUT_PATH}/mapping_avg_${RESOLUTION}.npz \
-       --suffix _${RESOLUTION} -f
+python ${SCRIPT_PATH}/downsample_ico_mesh.py \
+       --surface ${OUTPUT_PATH}/rh_white_avg_lps.vtk --res ${RESOLUTION} \
+       --output ${OUTPUT_PATH}/rh_white_avg_${RESOLUTION}.vtk -f
+
+python ${SCRIPT_PATH}/downsample_ico_mesh.py \
+       --surface ${OUTPUT_PATH}/lh_inflated_avg_lps.vtk --res ${RESOLUTION} \
+       --output ${OUTPUT_PATH}/lh_inflated_avg_${RESOLUTION}.vtk -f
+
+python ${SCRIPT_PATH}/downsample_ico_mesh.py \
+       --surface ${OUTPUT_PATH}/rh_inflated_avg_lps.vtk --res ${RESOLUTION} \
+       --output ${OUTPUT_PATH}/rh_inflated_avg_${RESOLUTION}.vtk -f
 
 # Step4) Generate the grid to be used in concon
 python ${SCRIPT_PATH}/concon/vtk_to_m.py \
@@ -99,6 +95,22 @@ rm ${OUTPUT_PATH}/tmp_rh_grid.m
 python ${SCRIPT_PATH}/get_coords.py --lh_surface ${OUTPUT_PATH}/lh_grid_avg_${RESOLUTION}.vtk --rh_surface ${OUTPUT_PATH}/rh_grid_avg_${RESOLUTION}.vtk --output ${OUTPUT_PATH}/grid_coords_${RESOLUTION}.mat -f
 python ${SCRIPT_PATH}/get_coords.py --lh_surface ${OUTPUT_PATH}/lh_grid_avg_${RESOLUTION}.vtk --rh_surface ${OUTPUT_PATH}/rh_grid_avg_${RESOLUTION}.vtk --output ${OUTPUT_PATH}/grid_coords_${RESOLUTION}.npz -f
 python ${SCRIPT_PATH}/get_adjacency_matrix.py --lh_surface ${OUTPUT_PATH}/lh_grid_avg_${RESOLUTION}.vtk --rh_surface ${OUTPUT_PATH}/rh_grid_avg_${RESOLUTION}.vtk --output ${OUTPUT_PATH}/adjacency_${RESOLUTION}.mat -f
+
+# Step6) Generate triangulations for the meshes
+python ${SCRIPT_PATH}/generate_grid_triangulation.py \
+  --lh_surface ${OUTPUT_PATH}/lh_grid_avg_${RESOLUTION}.vtk \
+  --rh_surface ${OUTPUT_PATH}/rh_grid_avg_${RESOLUTION}.vtk \
+  --output ${OUTPUT_PATH}/template_sphere_grid_${RESOLUTION}.mat -f
+
+python ${SCRIPT_PATH}/generate_grid_triangulation.py \
+  --lh_surface ${OUTPUT_PATH}/lh_white_avg_${RESOLUTION}.vtk \
+  --rh_surface ${OUTPUT_PATH}/rh_white_avg_${RESOLUTION}.vtk \
+  --output ${OUTPUT_PATH}/template_white_grid_${RESOLUTION}.mat -f
+
+python ${SCRIPT_PATH}/generate_grid_triangulation.py \
+  --lh_surface ${OUTPUT_PATH}/lh_inflated_avg_${RESOLUTION}.vtk \
+  --rh_surface ${OUTPUT_PATH}/rh_inflated_avg_${RESOLUTION}.vtk \
+  --output ${OUTPUT_PATH}/template_inflated_grid_${RESOLUTION}.mat -f
 
 ########################################
 # LOOP THROUGH AVAILABLE PARCELLATIONS #
