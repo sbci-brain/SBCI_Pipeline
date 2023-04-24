@@ -2,6 +2,11 @@
 
 echo "Begin preparing data: $(date)"
 
+# make sure all nii files are gzipped
+gzip -r anat/*.nii
+gzip -r dwi/*.nii
+gzip -r func/*.nii
+
 # flip T1
 cd anat
 mrconvert *_T1w.nii* -stride 1,2,3 t1.nii.gz -force

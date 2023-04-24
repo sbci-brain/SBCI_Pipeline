@@ -23,7 +23,7 @@ FODF_BVALS=(0 1000 2000 3000)
 PSC_PATH=/nas/longleaf/home/mrcole/PSC_Pipeline/
 SBCI_PATH=/nas/longleaf/home/mrcole/SBCI_Pipeline/
 FREESURFER_PATH=/nas/longleaf/apps/freesurfer/6.0.0/freesurfer/
-OUTPUT_PATH=/pine/scr/m/r/mrcole/ABCD/SBCI_AVG/
+OUTPUT_PATH=/nas/longleaf/home/ABCD/SBCI_AVG/
 
 ###########################################################################################
 # SC options: N_RUN number of times to run SET in parallel (SET)
@@ -34,7 +34,7 @@ OUTPUT_PATH=/pine/scr/m/r/mrcole/ABCD/SBCI_AVG/
 #             ROIS list of rois to generate meshes for and intersect streamlines with (SET)
 ###########################################################################################
 
-N_RUNS=3
+N_RUNS=4
 N_SEED=1000
 STEPS=75
 RNG=1234
