@@ -165,7 +165,9 @@ Before submitting any jobs, identify which subjects have all three modalities:
 
 ```bash
 cd /overflow/zzhanglab/ADNI/ADNI-bids
-./adni_scan_subjects.sh .
+SCRIPTS=/nas/longleaf/home/zz10c/software/SBCI_Pipeline/ADNI_example
+
+$SCRIPTS/adni_scan_subjects.sh .
 ```
 
 This writes four subject list files to the current directory:
@@ -183,8 +185,9 @@ Also writes `adni_scan_log.txt` with a per-subject table.
 
 ```bash
 SCRIPTS=/nas/longleaf/home/zz10c/software/SBCI_Pipeline/ADNI_example
+DATA=/overflow/zzhanglab/ADNI/ADNI-bids
 
-./adni_submit_corrections.sh subjects_anat_dwi_func.txt $SCRIPTS
+$SCRIPTS/adni_submit_corrections.sh $DATA/subjects_anat_dwi_func.txt $SCRIPTS
 ```
 
 This submits **two SLURM jobs per subject** — one for DWI, one for fMRI — with the fMRI job
@@ -202,11 +205,13 @@ sub-130S4417                      4821303      4821304
 **To test on a single subject first:**
 
 ```bash
+SCRIPTS=/nas/longleaf/home/zz10c/software/SBCI_Pipeline/ADNI_example
+
 # DWI correction only
-sbatch adni_dwi_eddy_correction.sh sub-130S4417
+sbatch $SCRIPTS/adni_dwi_eddy_correction.sh sub-130S4417
 
 # fMRI correction only (after DWI completes)
-sbatch adni_fmri_correction.sh sub-130S4417
+sbatch $SCRIPTS/adni_fmri_correction.sh sub-130S4417
 ```
 
 Runtime: DWI ~12 h per subject (topup ~30 min + eddy_cuda ~6–10 h on GPU); fMRI ~30 min.
@@ -241,9 +246,9 @@ chain for each subject.
 ```bash
 SCRIPTS=/nas/longleaf/home/zz10c/software/SBCI_Pipeline/ADNI_example
 OUT=/overflow/zzhanglab/ADNI/ADNI-bids
-IN=/overflow/zzhanglab/ADNI/ADNI-bids/subject_list_aa.txt
+IN=/overflow/zzhanglab/ADNI/ADNI-bids/subjects_anat_dwi_func.txt
 
-./preprocess.sh $IN $OUT $SCRIPTS
+$SCRIPTS/preprocess.sh $IN $OUT $SCRIPTS
 ```
 
 ### What each step does
@@ -291,7 +296,11 @@ at b=1000; sh_order 6 requires 28 directions (OK), sh_order 8 requires 45 (not e
 Run after preprocess.sh has completed for all subjects.
 
 ```bash
-./process_psc.sh $IN $OUT $SCRIPTS
+SCRIPTS=/nas/longleaf/home/zz10c/software/SBCI_Pipeline/ADNI_example
+OUT=/overflow/zzhanglab/ADNI/ADNI-bids
+IN=/overflow/zzhanglab/ADNI/ADNI-bids/subjects_anat_dwi_func.txt
+
+$SCRIPTS/process_psc.sh $IN $OUT $SCRIPTS
 ```
 
 The script submits `psc_step1_tractography.sh` for each subject. This runs whole-brain
@@ -307,7 +316,11 @@ Runtime: ~48 h per subject.
 Run after process_psc.sh has completed.
 
 ```bash
-./process_sbci.sh $IN $OUT $SCRIPTS
+SCRIPTS=/nas/longleaf/home/zz10c/software/SBCI_Pipeline/ADNI_example
+OUT=/overflow/zzhanglab/ADNI/ADNI-bids
+IN=/overflow/zzhanglab/ADNI/ADNI-bids/subjects_anat_dwi_func.txt
+
+$SCRIPTS/process_sbci.sh $IN $OUT $SCRIPTS
 ```
 
 The script submits SBCI steps 1–6 in a dependency chain. Step 1 (grid construction) runs
@@ -339,8 +352,12 @@ arguments: `IN` (subject list), `DATA` (data path), `OUT` (where to write the lo
 ### After preprocess.sh — check fODF
 
 ```bash
-./preprocess_qc.sh $IN $OUT $OUT
-mv preprocess_qc_log preprocess_qc_log_list_aa
+SCRIPTS=/nas/longleaf/home/zz10c/software/SBCI_Pipeline/ADNI_example
+OUT=/overflow/zzhanglab/ADNI/ADNI-bids
+IN=/overflow/zzhanglab/ADNI/ADNI-bids/subjects_anat_dwi_func.txt
+
+$SCRIPTS/preprocess_qc.sh $IN $OUT $OUT
+mv $OUT/preprocess_qc_log $OUT/preprocess_qc_log_adni
 ```
 
 Checks for: `dwi_pipeline/diffusion/fodf/fodf.nii.gz`
@@ -348,8 +365,8 @@ Checks for: `dwi_pipeline/diffusion/fodf/fodf.nii.gz`
 ### After process_psc.sh — check PSC connectome
 
 ```bash
-./psc_qc.sh $IN $OUT $OUT
-mv psc_qc_log psc_qc_log_list_aa
+$SCRIPTS/psc_qc.sh $IN $OUT $OUT
+mv $OUT/psc_qc_log $OUT/psc_qc_log_adni
 ```
 
 Checks for: `dwi_pipeline/psc_connectome/ABCD_desikan_cm_count_processed.mat`
@@ -357,8 +374,8 @@ Checks for: `dwi_pipeline/psc_connectome/ABCD_desikan_cm_count_processed.mat`
 ### After process_sbci.sh — check SC and FC matrices
 
 ```bash
-./sbci_qc.sh $IN $OUT $OUT
-mv sbci_qc_log sbci_qc_log_list_aa
+$SCRIPTS/sbci_qc.sh $IN $OUT $OUT
+mv $OUT/sbci_qc_log $OUT/sbci_qc_log_adni
 ```
 
 Checks for:
@@ -405,7 +422,11 @@ intermediate files and save disk space. This step is **irreversible** — do not
 until you are confident all subjects have finished correctly.
 
 ```bash
-./clean_subject_folders.sh $IN $OUT $SCRIPTS
+SCRIPTS=/nas/longleaf/home/zz10c/software/SBCI_Pipeline/ADNI_example
+OUT=/overflow/zzhanglab/ADNI/ADNI-bids
+IN=/overflow/zzhanglab/ADNI/ADNI-bids/subjects_anat_dwi_func.txt
+
+$SCRIPTS/clean_subject_folders.sh $IN $OUT $SCRIPTS
 ```
 
 This submits `postproc_clean_folders.sh` for each subject. It deletes intermediate
@@ -421,8 +442,8 @@ After cleaning, expect approximately 6 GB per subject (down from ~9 GB with raw 
 
 | Script | Purpose | Submission |
 |---|---|---|
-| `adni_scan_subjects.sh` | Scan BIDS dir; write categorized subject lists | `./adni_scan_subjects.sh [outdir]` |
-| `adni_submit_corrections.sh` | Submit one DWI + fMRI job pair per subject | `./adni_submit_corrections.sh <list> [scripts]` |
+| `adni_scan_subjects.sh` | Scan BIDS dir; write categorized subject lists | `$SCRIPTS/adni_scan_subjects.sh [outdir]` |
+| `adni_submit_corrections.sh` | Submit one DWI + fMRI job pair per subject | `$SCRIPTS/adni_submit_corrections.sh <list> $SCRIPTS` |
 | `adni_dwi_eddy_correction.sh` | DWI eddy + distortion correction (single subject, ~12 h) | `sbatch script.sh sub-XXXXXX` |
 | `adni_fmri_correction.sh` | fMRI B0 correction (single subject, ~30 min) | `sbatch script.sh sub-XXXXXX` |
 
