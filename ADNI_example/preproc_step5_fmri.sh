@@ -22,7 +22,7 @@
 #
 # Expected working directory structure before running this script:
 #   <subject_dir>/
-#   ├── dwi_sbci_connectome/structure/t1_freesurfer/  (from preproc_step3)
+#   ├── dwi_pipeline/structure/t1_freesurfer/  (from preproc_step3)
 #   └── fmri_distcorr/bold_distcorr.nii.gz            (from adni_fmri_correction.sh)
 #       OR func/<subject>_task-rest_bold.nii           (raw fallback)
 #
@@ -40,7 +40,7 @@ source ${FREESURFER_PATH}/SetUpFreeSurfer.sh
 
 echo "Begin FSFast fMRI preprocessing: $(date)"
 
-export SUBJECTS_DIR=$(pwd)/dwi_sbci_connectome/structure
+export SUBJECTS_DIR=$(pwd)/dwi_pipeline/structure
 
 # =============================================================================
 # Data preparation: place BOLD into FSFast directory layout

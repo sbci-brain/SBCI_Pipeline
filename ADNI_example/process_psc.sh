@@ -9,7 +9,7 @@ echo "Sourcing .bashrc"
 source ~/.bashrc_sbci
 
 # CHANGE LOCATION TO THE CONFIGURATION FILE FOR SBCI
-export SBCI_CONFIG=/nas/longleaf/home/zz10c/software/SBCI_Pipeline/ABCD_example/sbci_config
+export SBCI_CONFIG=/nas/longleaf/home/zz10c/software/SBCI_Pipeline/ADNI_example/sbci_config
 
 # CHANGE FOR SPECIFIC SBATCH OPTIONS
 OPTIONS=""
@@ -45,8 +45,8 @@ echo "Processing ${#subjects[@]} subject(s): ${JID}"
 ROOT=$(pwd)
 
 for i in $(seq 1 ${#subjects[@]}); do
-    if [ -d "${OUT}/${subjects[$idx]}" ]; then
         idx=$((i - 1))
+    if [ -d "${OUT}/${subjects[$idx]}" ]; then
 
         cd ${OUT}/${subjects[$idx]}
 

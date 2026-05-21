@@ -9,7 +9,7 @@ echo "Sourcing .bashrc"
 source ~/.bashrc_sbci
 
 # CHANGE LOCATION TO THE CONFIGURATION FILE FOR SBCI
-export SBCI_CONFIG=/nas/longleaf/home/zz10c/software/SBCI_Pipeline/ABCD_example/sbci_config
+export SBCI_CONFIG=/nas/longleaf/home/zz10c/software/SBCI_Pipeline/ADNI_example/sbci_config
 
 # CHANGE FOR SPECIFIC SBATCH OPTIONS
 OPTIONS=""
