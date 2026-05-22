@@ -30,7 +30,7 @@ mv dwi_pipeline/structure/t1_freesurfer ${OUTPUTDIR}/structure/
 mv dwi_pipeline/structure/map_wm.nii.gz ${OUTPUTDIR}/structure/
 mv dwi_pipeline/structure/map_gm.nii.gz ${OUTPUTDIR}/structure/
 mv dwi_pipeline/structure/map_csf.nii.gz ${OUTPUTDIR}/structure/
-mv dwi_pipeline/structure/interface.nii.gz ${OUTPUTDIR}/structure/
+mv dwi_pipeline/structure/interface_005.nii.gz ${OUTPUTDIR}/structure/
 mv dwi_pipeline/structure/seeding_mask.nii.gz ${OUTPUTDIR}/structure/
 mv dwi_pipeline/structure/aparc.a2009s+aseg_warped_label.nii.gz ${OUTPUTDIR}/structure/
 
@@ -82,7 +82,6 @@ mkdir -p ${OUTPUTDIR}/sbci_connectome
 #FC
 # mv dwi_pipeline/sbci_connectome/fc_ts.npz  ${OUTPUTDIR}/sbci_connectome/ # too large to keep right now (1.8GB)
 mv dwi_pipeline/sbci_connectome/fc_avg_*.mat ${OUTPUTDIR}/sbci_connectome/
-mv dwi_pipeline/sbci_connectome/fc_avg_*_ts.mat ${OUTPUTDIR}/sbci_connectome/
 
 #SC
 mv dwi_pipeline/sbci_connectome/subject_xing_sphere_avg_coords.tsv ${OUTPUTDIR}/sbci_connectome/ #template coordinates
