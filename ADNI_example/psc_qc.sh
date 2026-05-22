@@ -24,7 +24,7 @@ for i in $(seq 1 ${#subjects[@]}); do
     idx=$((i - 1))
     cd ${DATA}/${subjects[$idx]}
 
-    if [ ! -f "./dwi_pipeline/psc_connectome/ABCD_desikan_cm_count_processed.mat" ]; then
+    if [ ! -f "./dwi_pipeline/psc_connectome/ADNI_desikan_cm_count_processed.mat" ]; then
 	printf "${subjects[$idx]}\t FAILED\n" >> ${OUT}/psc_qc_log
     else
 	printf "${subjects[$idx]}\t COMPLETE\n" >> ${OUT}/psc_qc_log

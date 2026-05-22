@@ -23,7 +23,7 @@
 # Expected working directory structure before running this script:
 #   <subject_dir>/
 #   ├── dwi_pipeline/structure/t1_freesurfer/  (from preproc_step3)
-#   └── fmri_distcorr/bold_distcorr.nii.gz            (from adni_fmri_correction.sh)
+#   └── fmri/bold_distcorr.nii.gz                      (from adni_fmri_correction.sh)
 #       OR func/<subject>_task-rest_bold.nii           (raw fallback)
 #
 # Outputs:
@@ -56,9 +56,9 @@ RUN_DIR="fsfast/bold/001"
 mkdir -p "${RUN_DIR}"
 
 if [ ! -f "${RUN_DIR}/f.nii.gz" ]; then
-    if [ -f "fmri_distcorr/bold_distcorr.nii.gz" ]; then
-        echo "Using B0-corrected BOLD: fmri_distcorr/bold_distcorr.nii.gz"
-        cp "fmri_distcorr/bold_distcorr.nii.gz" "${RUN_DIR}/f.nii.gz"
+    if [ -f "fmri/bold_distcorr.nii.gz" ]; then
+        echo "Using B0-corrected BOLD: fmri/bold_distcorr.nii.gz"
+        cp "fmri/bold_distcorr.nii.gz" "${RUN_DIR}/f.nii.gz"
     else
         BOLD_RAW=$(find func -maxdepth 1 -name "*_task-rest_bold.nii*" | head -1)
         if [ -z "$BOLD_RAW" ]; then
@@ -81,9 +81,9 @@ fi
 # FSFast preprocessing
 # preproc-sess performs:
 #   - Motion correction (mcflirt-based)
-#   - Slice timing correction (Siemens interleaved: bottom-up alternating)
 #   - Spatial smoothing (5 mm FWHM)
 #   - Registration to fsaverage surface and MNI305 volume
+# Note: -stc omitted — FreeSurfer 6.0.0 slicedelay uses Python 2 syntax, crashes on Python 3
 # =============================================================================
 
 cd fsfast
@@ -94,7 +94,6 @@ SUBJECT_ID=.
 preproc-sess \
     -s ${SUBJECT_ID} \
     -fwhm 5 \
-    -stc siemens \
     -surface fsaverage lhrh \
     -per-run \
     -fsd bold \
@@ -122,8 +121,8 @@ fcseed-sess -s ${SUBJECT_ID} -cfg vcsf.config -force
 #
 # Temporal processing:
 #   -TR 3         — ADNI repetition time
-#   -stc siemens  — slice timing correction (interleaved Siemens, 48 slices)
 #   -nskip 4      — discard first 4 frames (12 s T1 saturation at TR=3 s)
+# Note: -stc omitted — FreeSurfer 6.0.0 slicedelay uses Python 2 syntax, crashes on Python 3
 #   -polyfit 2    — quadratic detrending (longer TR → more low-freq drift)
 #   -hpf 0.009    — highpass filter cutoff in Hz  (111 s period)
 #   -lpf 0.08     — lowpass filter cutoff in Hz   (12.5 s period)
@@ -145,7 +144,6 @@ mkanalysis-sess -analysis fc.surface.lh \
     -polyfit 2 \
     -fsd bold \
     -TR 3 \
-    -stc siemens \
     -hpf 0.009 \
     -lpf 0.08 \
     -inorm \
@@ -164,7 +162,6 @@ mkanalysis-sess -analysis fc.surface.rh \
     -polyfit 2 \
     -fsd bold \
     -TR 3 \
-    -stc siemens \
     -hpf 0.009 \
     -lpf 0.08 \
     -inorm \
@@ -183,7 +180,6 @@ mkanalysis-sess -analysis fc.mni \
     -polyfit 2 \
     -fsd bold \
     -TR 3 \
-    -stc siemens \
     -hpf 0.009 \
     -lpf 0.08 \
     -inorm \
