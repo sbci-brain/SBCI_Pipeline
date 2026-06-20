@@ -1,0 +1,10 @@
+# Python 3.11 required (scilpy caps at 3.12, trimeshpy caps at 3.11)
+numpy>=1.24.0
+scipy>=1.10.0
+nibabel>=5.2.0
+dipy>=1.11.0
+vtk>=9.2.0
+trimeshpy>=0.0.4
+scilpy>=2.2.0
+h5py>=3.7.0
+tqdm>=4.29.0
